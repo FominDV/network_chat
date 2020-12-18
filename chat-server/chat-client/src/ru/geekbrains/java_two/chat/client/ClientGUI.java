@@ -5,8 +5,6 @@ import ru.geekbrains.java_two.network.SocketThread;
 import ru.geekbrains.java_two.network.SocketThreadListener;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,12 +16,15 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler, SocketThreadListener {
-    private static final int WIDTH = 600;
+    private static final int WIDTH = 650;
     private static final int HEIGHT = 300;
     private final String cbPrivateText = "Send private message to ";
+    boolean isRegistrationProcess =false;
+    private RegistrationFrame registrationFrame;
 
     private final JTextArea log = new JTextArea();
     private final JPanel panelTop = new JPanel(new GridLayout(2, 3));
+    private final JPanel panelTopForButtons = new JPanel(new GridLayout(1, 2));
 
     private final JTextField tfIPAddress = new JTextField("127.0.0.1");
     private final JTextField tfPort = new JTextField("8189");
@@ -31,6 +32,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private final JTextField tfLogin = new JTextField("ivan");
     private final JPasswordField tfPassword = new JPasswordField("123");
     private final JButton btnLogin = new JButton("Login");
+    private final JButton btnRegistration = new JButton("Registration");
     private final JPanel panelAllBottom = new JPanel(new GridLayout(2, 1));
     private final JPanel panelBottom = new JPanel(new BorderLayout());
     private final JButton btnDisconnect = new JButton("<html><b>Disconnect</b></html>");
@@ -67,7 +69,10 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         btnSend.addActionListener(this);
         tfMessage.addActionListener(this);
         btnLogin.addActionListener(this);
+        btnRegistration.addActionListener(this);
         btnDisconnect.addActionListener(this);
+        panelTopForButtons.add(btnLogin);
+        panelTopForButtons.add(btnRegistration);
         panelAllBottom.add(cbPrivate);
         panelAllBottom.add(panelBottom);
         panelAllBottom.setVisible(false);
@@ -76,7 +81,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         panelTop.add(cbAlwaysOnTop);
         panelTop.add(tfLogin);
         panelTop.add(tfPassword);
-        panelTop.add(btnLogin);
+        panelTop.add(panelTopForButtons);
         panelBottom.add(btnDisconnect, BorderLayout.WEST);
         panelBottom.add(tfMessage, BorderLayout.CENTER);
         panelBottom.add(btnSend, BorderLayout.EAST);
@@ -104,17 +109,25 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             connect();
         } else if (src == btnDisconnect) {
             socketThread.close();
-        } else {
-            throw new RuntimeException("Unknown source: " + src);
-        }
+        } else if (src == btnRegistration) {
+            isRegistrationProcess=true;
+            if(!connect()) return;
+            registrationFrame=  new RegistrationFrame(this, tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
+            setVisible(false);
+        } else throw new RuntimeException("Unknown source: " + src);
     }
 
-    private void connect() {
+public void sendRegistrationData(String login, String password, String nickName){
+socketThread.sendMessage(Library.getRegistrationMessage(login,password,nickName));
+}
+    private boolean connect() {
         try {
             Socket socket = new Socket(tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
             socketThread = new SocketThread(this, "Client", socket);
+            return true;
         } catch (IOException e) {
             showException(Thread.currentThread(), e);
+            return false;
         }
     }
 
@@ -126,7 +139,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         if (cbPrivate.isSelected()) {
             if (!(userList.getSelectedValue() == null)) {
                 socketThread.sendMessage(Library.getTypeClientPrivate(userList.getSelectedValue(), msg));
-            }else {
+            } else {
                 putLog("ERROR");
                 cbPrivate.setSelected(false);
             }
@@ -156,6 +169,11 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 log.setCaretPosition(log.getDocument().getLength());
             }
         });
+    }
+
+    public void setLoginAndPasswordFields(String login, String password) {
+        tfLogin.setText(login);
+        tfPassword.setText(password);
     }
 
     private void showException(Thread t, Throwable e) {
@@ -194,7 +212,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 String[] usersArray = msg.split(Library.DELIMITER);
                 Arrays.sort(usersArray);
                 userList.setListData(usersArray);
-                if(userList.getSelectedValue()==null) userList.setSelectedIndex(0);
+                if (userList.getSelectedValue() == null) userList.setSelectedIndex(0);
                 break;
             case Library.TYPE_PRIVATE:
                 putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) + "private from " +
@@ -202,6 +220,13 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 break;
             case Library.TYPE_ERROR_SENDING_YOURSELF:
                 putLog("You try to send message yourself!");
+                break;
+            case Library.REGISTRATION_SUCCESSFULLY:
+                registrationFrame.registrationSuccessful();
+                isRegistrationProcess=false;
+                break;
+            case Library.REGISTRATION_NOT_SUCCESSFULLY:
+                registrationFrame.registrationNotSuccessful();
                 break;
             default:
                 throw new RuntimeException("Unknown message type: " + msg);
@@ -227,6 +252,12 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
 
     @Override
     public void onSocketStop(SocketThread thread) {
+        try{
+            registrationFrame.dispose();
+        }catch (Exception e){
+
+        }
+        setVisible(true);
         cbPrivate.setText(cbPrivateText);
         panelAllBottom.setVisible(false);
         panelTop.setVisible(true);
@@ -236,6 +267,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
 
     @Override
     public void onSocketReady(SocketThread thread, Socket socket) {
+        if(isRegistrationProcess) return;
         panelAllBottom.setVisible(true);
         panelTop.setVisible(false);
         String login = tfLogin.getText();

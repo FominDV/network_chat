@@ -24,6 +24,9 @@ public class Library {
     public static final String USER_LIST = "/user_list";
     public static final String TYPE_BCAST_CLIENT = "/client_bcast";
     public static final String TYPE_ERROR_SENDING_YOURSELF="/error_by_sending_yourself";
+    public static final String REGISTRATION="/registration";
+    public static final String REGISTRATION_SUCCESSFULLY = "/registration_successfully";
+    public static final String REGISTRATION_NOT_SUCCESSFULLY = "/registration_not_successfully";
 
     public static String getAuthRequest(String login, String password) {
         return AUTH_REQUEST + DELIMITER + login + DELIMITER + password;
@@ -64,5 +67,9 @@ public class Library {
     }
     public static String getErrorBySendingYourself(){
         return TYPE_ERROR_SENDING_YOURSELF;
+    }
+
+    public static String getRegistrationMessage(String login, String password, String nickName) {
+        return REGISTRATION+DELIMITER+login+DELIMITER+password+DELIMITER+nickName;
     }
 }

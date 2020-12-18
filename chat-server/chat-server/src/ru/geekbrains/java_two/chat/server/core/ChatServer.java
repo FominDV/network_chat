@@ -8,6 +8,7 @@ import ru.geekbrains.java_two.network.SocketThreadListener;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
@@ -47,29 +48,39 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     private void handleNonAuthMessage(ClientThread client, String msg) {
         String[] arr = msg.split(Library.DELIMITER);
-        if (arr.length != 3 || !arr[0].equals(Library.AUTH_REQUEST)) {
-            client.msgFormatError(msg);
-            return;
+        switch (arr[0]){
+            case Library.AUTH_REQUEST:
+                String login = arr[1];
+                String password = arr[2];
+                String nickname = SqlClient.getNickname(login, password);
+                if (nickname == null) {
+                    putLog("Invalid login attempt: " + login);
+                    client.authFail();
+                    return;
+                } else {
+                    ClientThread oldClient = findClientByLogin(login);
+                    if(findClientByNickname(nickname)!=null) client.incrementCount();
+                    client.authAccept(nickname, login);
+                    if (oldClient == null) {
+                        sendToAllAuthorizedClients(Library.getTypeBroadcast("Server", nickname + " connected"));
+                    } else {
+                        oldClient.reconnect();
+                        clients.remove(oldClient);
+                    }
+                }
+                sendToAllAuthorizedClients(Library.getUserList(getUsers()));
+                break;
+            case Library.REGISTRATION:
+                try{
+                if(SqlClient.registration(arr[1],arr[2],arr[3])) client.sendMessage(Library.REGISTRATION_SUCCESSFULLY);
+                else client.sendMessage(Library.REGISTRATION_NOT_SUCCESSFULLY);}catch (SQLException e){
+                    client.sendMessage(Library.REGISTRATION_NOT_SUCCESSFULLY);
+                }
+                break;
+            default:
+                client.msgFormatError(msg);
         }
-        String login = arr[1];
-        String password = arr[2];
-        String nickname = SqlClient.getNickname(login, password);
-        if (nickname == null) {
-            putLog("Invalid login attempt: " + login);
-            client.authFail();
-            return;
-        } else {
-            ClientThread oldClient = findClientByLogin(login);
-            if(findClientByNickname(nickname)!=null) client.incrementCount();
-            client.authAccept(nickname, login);
-            if (oldClient == null) {
-                sendToAllAuthorizedClients(Library.getTypeBroadcast("Server", nickname + " connected"));
-            } else {
-                oldClient.reconnect();
-                clients.remove(oldClient);
-            }
-        }
-        sendToAllAuthorizedClients(Library.getUserList(getUsers()));
+
     }
 
     private ClientThread findClientByLogin(String login) {

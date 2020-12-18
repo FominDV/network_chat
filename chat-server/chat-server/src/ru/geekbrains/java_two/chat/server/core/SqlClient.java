@@ -37,4 +37,14 @@ public class SqlClient {
             throw new RuntimeException(e);
         }
     }
+
+    synchronized static boolean registration(String login, String password, String nickName) throws SQLException{
+        String query = String.format("select login from clients where login = '%s'", login);
+        ResultSet set = null;
+            set = statement.executeQuery(query);
+            if (set.next()) return false;
+        query=String.format("insert into clients (login, password, nickname) values ('%s','%s','%s')",login,password,nickName);
+        statement.executeUpdate(query);
+        return true;
+    }
 }
