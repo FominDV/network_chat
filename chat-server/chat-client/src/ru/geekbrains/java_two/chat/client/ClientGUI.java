@@ -30,7 +30,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private final JTextField tfIPAddress = new JTextField("127.0.0.1");
     private final JTextField tfPort = new JTextField("8189");
     private final JCheckBox cbAlwaysOnTop = new JCheckBox("Always on top");
-    private final JTextField tfLogin = new JTextField("ivan");
+    private final JTextField tfLogin = new JTextField("FDV");
     private final JPasswordField tfPassword = new JPasswordField("123");
     private final JButton btnLogin = new JButton("Login");
     private final JButton btnRegistration = new JButton("Registration");
@@ -235,6 +235,9 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             case Library.REGISTRATION_NOT_SUCCESSFULLY:
                 registrationFrame.registrationNotSuccessful();
                 break;
+            case Library.NICKNAME_WAS_CHANGED:
+                changingNicknameFrame.changingSuccessful();
+                break;
             default:
                 throw new RuntimeException("Unknown message type: " + msg);
         }
@@ -294,5 +297,9 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     @Override
     public void onSocketException(SocketThread thread, Exception exception) {
         showException(thread, exception);
+    }
+
+    public void sendChangingNicknameMessage(String newNickname) {
+        socketThread.sendMessage(Library.getChangingNicknameMessage(newNickname));
     }
 }

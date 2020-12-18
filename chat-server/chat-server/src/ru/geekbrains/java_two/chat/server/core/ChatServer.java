@@ -104,6 +104,9 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
             case Library.TYPE_PRIVATE:
                 sendPrivateMessage(arr[1], client, Library.getTypePrivate(client.getNickname(), arr[2]));
                 break;
+            case Library.CHANGING_NICKNAME:
+                    if(SqlClient.changeNickname(arr[1],client.getLogin())) client.sendMessage(Library.NICKNAME_WAS_CHANGED);
+                break;
             default:
                 client.msgFormatError(msg);
 
