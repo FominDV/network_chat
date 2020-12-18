@@ -23,12 +23,7 @@ public class ServerGUI extends JFrame implements ActionListener, Thread.Uncaught
 
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new ServerGUI();
-            }
-        });
+        SwingUtilities.invokeLater(() -> new ServerGUI());
     }
 
     private ServerGUI() {
