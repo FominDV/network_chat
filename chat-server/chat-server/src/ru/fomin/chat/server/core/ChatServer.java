@@ -1,6 +1,6 @@
 package ru.fomin.chat.server.core;
 
-import ru.fomin.chat.common.Library;
+import static ru.fomin.chat.common.Library.*;
 import rufomin.network.ServerSocketThread;
 import rufomin.network.ServerSocketThreadListener;
 import rufomin.network.SocketThread;
@@ -47,9 +47,9 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     }
 
     private void handleNonAuthMessage(ClientThread client, String msg) {
-        String[] arr = msg.split(Library.DELIMITER);
+        String[] arr = msg.split(DELIMITER);
         switch (arr[0]){
-            case Library.AUTH_REQUEST:
+            case AUTH_REQUEST:
                 String login = arr[1];
                 String password = arr[2];
                 String nickname = SqlClient.getNickname(login, password);
@@ -62,19 +62,19 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
                     if(findClientByNickname(nickname)!=null)nickname= client.getNicknameWithIncrement(nickname);
                     client.authAccept(nickname, login);
                     if (oldClient == null) {
-                        sendToAllAuthorizedClients(Library.getTypeBroadcast("Server", nickname + " connected"));
+                        sendToAllAuthorizedClients(getTypeBroadcast("Server", nickname + " connected"));
                     } else {
                         oldClient.reconnect();
                         clients.remove(oldClient);
                     }
                 }
-                sendToAllAuthorizedClients(Library.getUserList(getUsers()));
+                sendToAllAuthorizedClients(getUserList(getUsers()));
                 break;
-            case Library.REGISTRATION:
+            case REGISTRATION:
                 try{
-                if(SqlClient.registration(arr[1],arr[2],arr[3])) client.sendMessage(Library.REGISTRATION_SUCCESSFULLY);
-                else client.sendMessage(Library.REGISTRATION_NOT_SUCCESSFULLY);}catch (SQLException e){
-                    client.sendMessage(Library.REGISTRATION_NOT_SUCCESSFULLY);
+                if(SqlClient.registration(arr[1],arr[2],arr[3])) client.sendMessage(REGISTRATION_SUCCESSFULLY);
+                else client.sendMessage(REGISTRATION_NOT_SUCCESSFULLY);}catch (SQLException e){
+                    client.sendMessage(REGISTRATION_NOT_SUCCESSFULLY);
                 }
                 break;
             default:
@@ -94,18 +94,18 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     }
 
     private void handleAuthMessage(ClientThread client, String msg) {
-        String[] arr = msg.split(Library.DELIMITER);
+        String[] arr = msg.split(DELIMITER);
         String msgType = arr[0];
         switch (msgType) {
-            case Library.TYPE_BCAST_CLIENT:
-                sendToAllAuthorizedClients(Library.getTypeBroadcast(
+            case TYPE_BCAST_CLIENT:
+                sendToAllAuthorizedClients(getTypeBroadcast(
                         client.getNickname(), arr[1]));
                 break;
-            case Library.TYPE_PRIVATE:
-                sendPrivateMessage(arr[1], client, Library.getTypePrivate(client.getNickname(), arr[2]));
+            case TYPE_PRIVATE:
+                sendPrivateMessage(arr[1], client, getTypePrivate(client.getNickname(), arr[2]));
                 break;
-            case Library.CHANGING_NICKNAME:
-                    if(SqlClient.changeNickname(arr[1],client.getLogin())) client.sendMessage(Library.NICKNAME_WAS_CHANGED);
+            case CHANGING_NICKNAME:
+                    if(SqlClient.changeNickname(arr[1],client.getLogin())) client.sendMessage(NICKNAME_WAS_CHANGED);
                 break;
             default:
                 client.msgFormatError(msg);
@@ -116,7 +116,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     private void sendPrivateMessage(String destination, ClientThread src, String msg) {
         ClientThread destinationClientThread = findClientByNickname(destination);
         if (destinationClientThread.equals(src)) {
-            src.sendMessage(Library.getErrorBySendingYourself());
+            src.sendMessage(getErrorBySendingYourself());
             return;
         }
         src.sendMessage(msg);
@@ -137,7 +137,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
         for (int i = 0; i < clients.size(); i++) {
             ClientThread client = (ClientThread) clients.get(i);
             if (!client.isAuthorized()) continue;
-            sb.append(client.getNickname()).append(Library.DELIMITER);
+            sb.append(client.getNickname()).append(DELIMITER);
         }
         return sb.toString();
     }
@@ -212,10 +212,10 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
         clients.remove(thread);
         ClientThread client = (ClientThread) thread;
         if (client.isAuthorized() && !client.isReconnecting()) {
-            sendToAllAuthorizedClients(Library.getTypeBroadcast("Server",
+            sendToAllAuthorizedClients(getTypeBroadcast("Server",
                     client.getNickname() + " disconnected"));
         }
-        sendToAllAuthorizedClients(Library.getUserList(getUsers()));
+        sendToAllAuthorizedClients(getUserList(getUsers()));
 
     }
 

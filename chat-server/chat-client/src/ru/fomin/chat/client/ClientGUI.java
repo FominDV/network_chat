@@ -1,6 +1,6 @@
 package ru.fomin.chat.client;
 
-import ru.fomin.chat.common.Library;
+import static ru.fomin.chat.common.Library.*;
 import rufomin.network.SocketThread;
 import rufomin.network.SocketThreadListener;
 
@@ -127,7 +127,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     }
 
     public void sendRegistrationData(String login, String password, String nickName) {
-        socketThread.sendMessage(Library.getRegistrationMessage(login, password, nickName));
+        socketThread.sendMessage(getRegistrationMessage(login, password, nickName));
     }
 
     private boolean connect() {
@@ -148,13 +148,13 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         tfMessage.grabFocus();
         if (cbPrivate.isSelected()) {
             if (!(userList.getSelectedValue() == null)) {
-                socketThread.sendMessage(Library.getTypeClientPrivate(userList.getSelectedValue(), msg));
+                socketThread.sendMessage(getTypeClientPrivate(userList.getSelectedValue(), msg));
             } else {
                 putLog("ERROR");
                 cbPrivate.setSelected(false);
             }
         } else {
-            socketThread.sendMessage(Library.getTypeClientBcast(msg));
+            socketThread.sendMessage(getTypeClientBcast(msg));
         }
     }
 
@@ -197,45 +197,45 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     }
 
     private void handleMessage(String msg) {
-        String[] arr = msg.split(Library.DELIMITER);
+        String[] arr = msg.split(DELIMITER);
         String msgType = arr[0];
         switch (msgType) {
-            case Library.AUTH_ACCEPT:
+            case AUTH_ACCEPT:
                 setTitle(WINDOW_TITLE + " entered with nickname: " + arr[1]);
                 break;
-            case Library.AUTH_DENIED:
+            case AUTH_DENIED:
                 putLog("Authorization failed");
                 break;
-            case Library.MSG_FORMAT_ERROR:
+            case MSG_FORMAT_ERROR:
                 putLog(msg);
                 socketThread.close();
                 break;
-            case Library.TYPE_BROADCAST:
+            case TYPE_BROADCAST:
                 putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) +
                         arr[2] + ": " + arr[3]);
                 break;
-            case Library.USER_LIST:
-                msg = msg.substring(Library.USER_LIST.length() + Library.DELIMITER.length());
-                String[] usersArray = msg.split(Library.DELIMITER);
+            case USER_LIST:
+                msg = msg.substring(USER_LIST.length() + DELIMITER.length());
+                String[] usersArray = msg.split(DELIMITER);
                 Arrays.sort(usersArray);
                 userList.setListData(usersArray);
                 if (userList.getSelectedValue() == null) userList.setSelectedIndex(0);
                 break;
-            case Library.TYPE_PRIVATE:
+            case TYPE_PRIVATE:
                 putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) + "private from " +
                         arr[2] + ": " + arr[3]);
                 break;
-            case Library.TYPE_ERROR_SENDING_YOURSELF:
+            case TYPE_ERROR_SENDING_YOURSELF:
                 putLog("You try to send message yourself!");
                 break;
-            case Library.REGISTRATION_SUCCESSFULLY:
+            case REGISTRATION_SUCCESSFULLY:
                 registrationFrame.registrationSuccessful();
                 isRegistrationProcess = false;
                 break;
-            case Library.REGISTRATION_NOT_SUCCESSFULLY:
+            case REGISTRATION_NOT_SUCCESSFULLY:
                 registrationFrame.registrationNotSuccessful();
                 break;
-            case Library.NICKNAME_WAS_CHANGED:
+            case NICKNAME_WAS_CHANGED:
                 changingNicknameFrame.changingSuccessful();
                 break;
             default:
@@ -286,7 +286,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         panelTop.setVisible(false);
         String login = tfLogin.getText();
         String password = new String(tfPassword.getPassword());
-        thread.sendMessage(Library.getAuthRequest(login, password));
+        thread.sendMessage(getAuthRequest(login, password));
     }
 
     @Override
@@ -300,6 +300,6 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     }
 
     public void sendChangingNicknameMessage(String newNickname) {
-        socketThread.sendMessage(Library.getChangingNicknameMessage(newNickname));
+        socketThread.sendMessage(getChangingNicknameMessage(newNickname));
     }
 }
