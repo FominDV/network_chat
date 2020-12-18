@@ -6,9 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ChangingNicknameFrame extends JFrame implements ActionListener {
-    private final String TITLE = "Edit nickname";
-    private final int WIDTH = 200;
-    private final int HEIGHT = 150;
+    private static final String TITLE = "Edit nickname";
+    private static final int WIDTH = 200;
+    private static final int HEIGHT = 150;
     private final ClientGUI clientGUI;
     private static final String MESSAGE_SUCCESSFULLY_CHANGING_NICKNAME="Nickname was changed\nFor finishing this process you should reconnect!\nNew nickname: ";
 
