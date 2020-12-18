@@ -17,7 +17,6 @@ public class SqlClient {
     }
 
     synchronized static String getNickname(String login, String password) {
-//        select nickname from clients where login = 'ivan' and password = '123'
         String query = String.format("select nickname from clients where login = '%s' and password = '%s'",
                 login, password);
 

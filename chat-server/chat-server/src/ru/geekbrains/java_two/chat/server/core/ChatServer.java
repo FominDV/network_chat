@@ -59,8 +59,9 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
             client.authFail();
             return;
         } else {
-            ClientThread oldClient = findClientByNickname(nickname);
-            client.authAccept(nickname);
+            ClientThread oldClient = findClientByLogin(login);
+            if(findClientByNickname(nickname)!=null) client.incrementCount();
+            client.authAccept(nickname, login);
             if (oldClient == null) {
                 sendToAllAuthorizedClients(Library.getTypeBroadcast("Server", nickname + " connected"));
             } else {
@@ -69,6 +70,16 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
             }
         }
         sendToAllAuthorizedClients(Library.getUserList(getUsers()));
+    }
+
+    private ClientThread findClientByLogin(String login) {
+        for (int i = 0; i < clients.size(); i++) {
+            ClientThread client = (ClientThread) clients.get(i);
+            if (!client.isAuthorized()) continue;
+            if (client.getLogin().equals(login))
+                return client;
+        }
+        return null;
     }
 
     private void handleAuthMessage(ClientThread client, String msg) {
@@ -80,7 +91,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
                         client.getNickname(), arr[1]));
                 break;
             case Library.TYPE_PRIVATE:
-                sendToOneClient(arr[1], client, Library.getTypePrivate(client.getNickname(), arr[2]));
+                sendPrivateMessage(arr[1], client, Library.getTypePrivate(client.getNickname(), arr[2]));
                 break;
             default:
                 client.msgFormatError(msg);
@@ -88,19 +99,16 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
         }
     }
 
-    private void sendToOneClient(String destination, ClientThread src, String msg) {
-        for (int i = 0; i < clients.size(); i++){
-            ClientThread recipient = (ClientThread) clients.get(i);
-            if(recipient.getNickname().equals(destination)){
-                if(recipient.equals(src)){
-                    src.sendMessage(Library.getErrorBySendingYourself());
-                    return;
-                }
-                src.sendMessage(msg);
-                recipient.sendMessage(msg);
-            }
+    private void sendPrivateMessage(String destination, ClientThread src, String msg) {
+        ClientThread destinationClientThread = findClientByNickname(destination);
+        if (destinationClientThread.equals(src)) {
+            src.sendMessage(Library.getErrorBySendingYourself());
+            return;
         }
+        src.sendMessage(msg);
+        destinationClientThread.sendMessage(msg);
     }
+
 
     private void sendToAllAuthorizedClients(String msg) {
         for (int i = 0; i < clients.size(); i++) {
@@ -157,7 +165,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     @Override
     public void onServerTimeout(ServerSocketThread thread, ServerSocket server) {
-//        putLog("Server timeout");
+      //  putLog("Server timeout");
 
     }
 
