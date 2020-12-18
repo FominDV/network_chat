@@ -59,7 +59,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
                     return;
                 } else {
                     ClientThread oldClient = findClientByLogin(login);
-                    if(findClientByNickname(nickname)!=null) client.incrementCount();
+                    if(findClientByNickname(nickname)!=null)nickname= client.getNicknameWithIncrement(nickname);
                     client.authAccept(nickname, login);
                     if (oldClient == null) {
                         sendToAllAuthorizedClients(Library.getTypeBroadcast("Server", nickname + " connected"));

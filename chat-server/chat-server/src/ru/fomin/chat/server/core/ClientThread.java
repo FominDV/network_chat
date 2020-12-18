@@ -10,7 +10,7 @@ public class ClientThread extends SocketThread {
 
     private String nickname, login;
     private boolean isAuthorized, isReconnecting;
-    private int count = 0;
+    private static int count = 0;
 
     public ClientThread(SocketThreadListener listener, String name, Socket socket) {
         super(listener, name, socket);
@@ -38,11 +38,8 @@ public class ClientThread extends SocketThread {
     }
 
     void authAccept(String nickname, String login) {
-        String postfixNickName;
         isAuthorized = true;
-        if (count == 0) postfixNickName = "";
-        else postfixNickName = "(" + count + ")";
-        this.nickname = nickname + postfixNickName;
+        this.nickname = nickname;
         this.login = login;
         sendMessage(Library.getAuthAccept(nickname));
     }
@@ -58,7 +55,11 @@ public class ClientThread extends SocketThread {
     }
 
 
-    public void incrementCount() {
+    public String getNicknameWithIncrement(String nickname) {
         count++;
+        String postfixNickName;
+        if (count == 0) postfixNickName = "";
+        else postfixNickName = "(" + count + ")";
+        return nickname+postfixNickName;
     }
 }
