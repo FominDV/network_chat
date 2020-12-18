@@ -19,8 +19,9 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private static final int WIDTH = 650;
     private static final int HEIGHT = 300;
     private final String cbPrivateText = "Send private message to ";
-    boolean isRegistrationProcess =false;
+    boolean isRegistrationProcess = false;
     private RegistrationFrame registrationFrame;
+    private ChangingNicknameFrame changingNicknameFrame;
 
     private final JTextArea log = new JTextArea();
     private final JPanel panelTop = new JPanel(new GridLayout(2, 3));
@@ -34,7 +35,9 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private final JButton btnLogin = new JButton("Login");
     private final JButton btnRegistration = new JButton("Registration");
     private final JPanel panelAllBottom = new JPanel(new GridLayout(2, 1));
+    private final JPanel panelBottomTop = new JPanel(new GridLayout(1, 2));
     private final JPanel panelBottom = new JPanel(new BorderLayout());
+    private final JButton btnChangeNickname = new JButton("<html><b>Change nickname</b></html>");
     private final JButton btnDisconnect = new JButton("<html><b>Disconnect</b></html>");
     private final JTextField tfMessage = new JTextField();
     private final JButton btnSend = new JButton("Send");
@@ -71,9 +74,12 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         btnLogin.addActionListener(this);
         btnRegistration.addActionListener(this);
         btnDisconnect.addActionListener(this);
+        btnChangeNickname.addActionListener(this);
         panelTopForButtons.add(btnLogin);
         panelTopForButtons.add(btnRegistration);
-        panelAllBottom.add(cbPrivate);
+        panelBottomTop.add(cbPrivate);
+        panelBottomTop.add(btnChangeNickname);
+        panelAllBottom.add(panelBottomTop);
         panelAllBottom.add(panelBottom);
         panelAllBottom.setVisible(false);
         panelTop.add(tfIPAddress);
@@ -110,16 +116,20 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         } else if (src == btnDisconnect) {
             socketThread.close();
         } else if (src == btnRegistration) {
-            isRegistrationProcess=true;
-            if(!connect()) return;
-            registrationFrame=  new RegistrationFrame(this, tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
+            isRegistrationProcess = true;
+            if (!connect()) return;
+            registrationFrame = new RegistrationFrame(this, tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
+            setVisible(false);
+        } else if (src == btnChangeNickname) {
+            changingNicknameFrame = new ChangingNicknameFrame(this);
             setVisible(false);
         } else throw new RuntimeException("Unknown source: " + src);
     }
 
-public void sendRegistrationData(String login, String password, String nickName){
-socketThread.sendMessage(Library.getRegistrationMessage(login,password,nickName));
-}
+    public void sendRegistrationData(String login, String password, String nickName) {
+        socketThread.sendMessage(Library.getRegistrationMessage(login, password, nickName));
+    }
+
     private boolean connect() {
         try {
             Socket socket = new Socket(tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
@@ -162,12 +172,9 @@ socketThread.sendMessage(Library.getRegistrationMessage(login,password,nickName)
 
     private void putLog(String msg) {
         if ("".equals(msg)) return;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                log.append(msg + "\n");
-                log.setCaretPosition(log.getDocument().getLength());
-            }
+        SwingUtilities.invokeLater(() -> {
+            log.append(msg + "\n");
+            log.setCaretPosition(log.getDocument().getLength());
         });
     }
 
@@ -223,7 +230,7 @@ socketThread.sendMessage(Library.getRegistrationMessage(login,password,nickName)
                 break;
             case Library.REGISTRATION_SUCCESSFULLY:
                 registrationFrame.registrationSuccessful();
-                isRegistrationProcess=false;
+                isRegistrationProcess = false;
                 break;
             case Library.REGISTRATION_NOT_SUCCESSFULLY:
                 registrationFrame.registrationNotSuccessful();
@@ -252,10 +259,13 @@ socketThread.sendMessage(Library.getRegistrationMessage(login,password,nickName)
 
     @Override
     public void onSocketStop(SocketThread thread) {
-        try{
+        try {
             registrationFrame.dispose();
-        }catch (Exception e){
-
+        } catch (Exception e) {
+        }
+        try {
+            changingNicknameFrame.dispose();
+        } catch (Exception e) {
         }
         setVisible(true);
         cbPrivate.setText(cbPrivateText);
@@ -263,11 +273,12 @@ socketThread.sendMessage(Library.getRegistrationMessage(login,password,nickName)
         panelTop.setVisible(true);
         setTitle(WINDOW_TITLE);
         userList.setListData(new String[0]);
+        JOptionPane.showMessageDialog(null, "Connection was lost");
     }
 
     @Override
     public void onSocketReady(SocketThread thread, Socket socket) {
-        if(isRegistrationProcess) return;
+        if (isRegistrationProcess) return;
         panelAllBottom.setVisible(true);
         panelTop.setVisible(false);
         String login = tfLogin.getText();
