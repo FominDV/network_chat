@@ -50,13 +50,15 @@ public class ChangingNicknameFrame extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(null, "Uou should insert new nickname!", "ERROR", JOptionPane.ERROR_MESSAGE);
             else clientGUI.sendChangingNicknameMessage(newNickname);
         } else if (source == btnCancel) {
-            clientGUI.setVisible(true);
-            dispose();
+            cancel();
         } else throw new RuntimeException("Unknown source: " + source);
     }
 
     public void changingSuccessful() {
         JOptionPane.showMessageDialog(null,MESSAGE_SUCCESSFULLY_CHANGING_NICKNAME+tfNickName.getText());
+        cancel();
+    }
+    private void cancel(){
         clientGUI.setVisible(true);
         dispose();
     }

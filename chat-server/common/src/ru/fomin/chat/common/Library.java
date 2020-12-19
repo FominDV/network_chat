@@ -29,6 +29,8 @@ public class Library {
     public static final String REGISTRATION_NOT_SUCCESSFULLY = "/registration_not_successfully";
     public static final String NICKNAME_WAS_CHANGED = "/nickname_was_changed";
     public static final String CHANGING_NICKNAME = "/changing_nickname";
+    public static final String CHANGING_PASSWORD= "/changing_password";
+    public static final String CHANGING_PASSWORD_ERROR= "/changing_password_error";
 
 
     public static String getAuthRequest(String login, String password) {
@@ -78,5 +80,8 @@ public class Library {
 
     public static String getChangingNicknameMessage(String newNickname) {
         return CHANGING_NICKNAME+DELIMITER+newNickname;
+    }
+    public static String  getChangingPasswordMessage(String password,String newPassword){
+        return CHANGING_PASSWORD+DELIMITER+password+DELIMITER+newPassword;
     }
 }

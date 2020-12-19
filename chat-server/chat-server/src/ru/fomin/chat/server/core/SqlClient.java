@@ -8,7 +8,9 @@ public class SqlClient {
     private final static String QUERY_GET_NICKNAME="select nickname from clients where login = '%s' and password = '%s'",
             QUERY_GET_LOGIN_BY_LOGIN="select login from clients where login = '%s'",
             QUERY_ADD_CLIENT="insert into clients (login, password, nickname) values ('%s','%s','%s')",
-            QUERY_CHANGE_NICKNAME="update clients set nickname='%s' where login='%s'" ;
+            QUERY_CHANGE_NICKNAME="update clients set nickname='%s' where login='%s'" ,
+            QUERY_GET_PASSWORD_BY_LOGIN ="select password from clients where login = '%s'",
+            QUERY_CHANGE_PASSWORD ="update clients set password='%s' where login='%s'";
 
     synchronized static void connect() {
         try {
@@ -51,7 +53,7 @@ public class SqlClient {
         return true;
     }
 
-    public static boolean changeNickname(String newNickname, String login) {
+    public synchronized static boolean changeNickname(String newNickname, String login) {
         String query=String.format(QUERY_CHANGE_NICKNAME,newNickname,login);
         try {
             statement.executeUpdate(query);
@@ -59,5 +61,12 @@ public class SqlClient {
             return false;
         }
         return true;
+    }
+    public synchronized static boolean changePassword(String password,String newPassword,String login) throws SQLException{
+        String query = String.format(QUERY_GET_PASSWORD_BY_LOGIN, login);
+        if(!statement.executeQuery(query).getString(1).equals(password)) return false;
+        query=String.format(QUERY_CHANGE_PASSWORD,newPassword,login);
+        statement.executeUpdate(query);
+    return true;
     }
 }

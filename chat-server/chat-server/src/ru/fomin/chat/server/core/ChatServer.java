@@ -107,6 +107,14 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
             case CHANGING_NICKNAME:
                     if(SqlClient.changeNickname(arr[1],client.getLogin())) client.sendMessage(NICKNAME_WAS_CHANGED);
                 break;
+            case CHANGING_PASSWORD:
+                try {
+                    if(SqlClient.changePassword(arr[1],arr[2], client.getLogin())) client.sendMessage(CHANGING_PASSWORD); else client.sendMessage(CHANGING_PASSWORD_ERROR);
+                }catch (SQLException e){
+                    client.sendMessage(CHANGING_PASSWORD_ERROR);
+                }
+
+                break;
             default:
                 client.msgFormatError(msg);
 

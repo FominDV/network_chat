@@ -1,6 +1,7 @@
 package ru.fomin.chat.client;
 
 import static ru.fomin.chat.common.Library.*;
+
 import rufomin.network.SocketThread;
 import rufomin.network.SocketThreadListener;
 
@@ -22,6 +23,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     boolean isRegistrationProcess = false;
     private RegistrationFrame registrationFrame;
     private ChangingNicknameFrame changingNicknameFrame;
+    private ChangingPasswordFrame changingPasswordFrame;
 
     private final JTextArea log = new JTextArea();
     private final JPanel panelTop = new JPanel(new GridLayout(2, 3));
@@ -35,9 +37,10 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private final JButton btnLogin = new JButton("Login");
     private final JButton btnRegistration = new JButton("Registration");
     private final JPanel panelAllBottom = new JPanel(new GridLayout(2, 1));
-    private final JPanel panelBottomTop = new JPanel(new GridLayout(1, 2));
+    private final JPanel panelButtonsForEditTop = new JPanel(new GridLayout(2, 1));
     private final JPanel panelBottom = new JPanel(new BorderLayout());
-    private final JButton btnChangeNickname = new JButton("<html><b>Change nickname</b></html>");
+    private final JButton btnChangeNickname = new JButton("<html><b>Change<br>Nickname</b></html>");
+    private final JButton btnChangePassword = new JButton("<html><b>Change<br>Password</b></html>");
     private final JButton btnDisconnect = new JButton("<html><b>Disconnect</b></html>");
     private final JTextField tfMessage = new JTextField();
     private final JButton btnSend = new JButton("Send");
@@ -75,11 +78,12 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         btnRegistration.addActionListener(this);
         btnDisconnect.addActionListener(this);
         btnChangeNickname.addActionListener(this);
+        btnChangePassword.addActionListener(this);
         panelTopForButtons.add(btnLogin);
         panelTopForButtons.add(btnRegistration);
-        panelBottomTop.add(cbPrivate);
-        panelBottomTop.add(btnChangeNickname);
-        panelAllBottom.add(panelBottomTop);
+        panelButtonsForEditTop.add(btnChangeNickname);
+        panelButtonsForEditTop.add(btnChangePassword);
+        panelAllBottom.add(cbPrivate);
         panelAllBottom.add(panelBottom);
         panelAllBottom.setVisible(false);
         panelTop.add(tfIPAddress);
@@ -97,11 +101,13 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             else
                 cbPrivate.setText(cbPrivateText + userList.getSelectedValue());
         });
+        add(panelButtonsForEditTop, BorderLayout.WEST);
         add(scrollLog, BorderLayout.CENTER);
         add(scrollUser, BorderLayout.EAST);
         add(panelTop, BorderLayout.NORTH);
         add(panelAllBottom, BorderLayout.SOUTH);
         setVisible(true);
+        panelButtonsForEditTop.setVisible(false);
     }
 
     @Override
@@ -123,7 +129,14 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         } else if (src == btnChangeNickname) {
             changingNicknameFrame = new ChangingNicknameFrame(this);
             setVisible(false);
+        } else if (src == btnChangePassword) {
+            changingPasswordFrame = new ChangingPasswordFrame(this);
+            setVisible(false);
         } else throw new RuntimeException("Unknown source: " + src);
+    }
+
+    public void sendChangingPasswordMessage(String password, String newPassword) {
+        socketThread.sendMessage(getChangingPasswordMessage(password, newPassword));
     }
 
     public void sendRegistrationData(String login, String password, String nickName) {
@@ -205,6 +218,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 break;
             case AUTH_DENIED:
                 putLog("Authorization failed");
+                JOptionPane.showMessageDialog(null, "Login or password is wrong!","Authorization failed",JOptionPane.ERROR_MESSAGE);
                 break;
             case MSG_FORMAT_ERROR:
                 putLog(msg);
@@ -238,6 +252,12 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             case NICKNAME_WAS_CHANGED:
                 changingNicknameFrame.changingSuccessful();
                 break;
+            case CHANGING_PASSWORD:
+                changingPasswordFrame.changingSuccessful();
+                break;
+            case CHANGING_PASSWORD_ERROR:
+                changingPasswordFrame.changingFailed();
+                break;
             default:
                 throw new RuntimeException("Unknown message type: " + msg);
         }
@@ -270,13 +290,17 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             changingNicknameFrame.dispose();
         } catch (Exception e) {
         }
+        try {
+            changingPasswordFrame.dispose();
+        } catch (Exception e) {
+        }
         setVisible(true);
         cbPrivate.setText(cbPrivateText);
         panelAllBottom.setVisible(false);
+        panelButtonsForEditTop.setVisible(false);
         panelTop.setVisible(true);
         setTitle(WINDOW_TITLE);
         userList.setListData(new String[0]);
-        JOptionPane.showMessageDialog(null, "Connection was lost");
     }
 
     @Override
@@ -284,6 +308,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         if (isRegistrationProcess) return;
         panelAllBottom.setVisible(true);
         panelTop.setVisible(false);
+        panelButtonsForEditTop.setVisible(true);
         String login = tfLogin.getText();
         String password = new String(tfPassword.getPassword());
         thread.sendMessage(getAuthRequest(login, password));
