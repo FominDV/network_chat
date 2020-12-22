@@ -31,6 +31,7 @@ public class Library {
     public static final String CHANGING_NICKNAME = "/changing_nickname";
     public static final String CHANGING_PASSWORD= "/changing_password";
     public static final String CHANGING_PASSWORD_ERROR= "/changing_password_error";
+    public static final String SERVER="Server";
 
 
     public static String getAuthRequest(String login, String password) {

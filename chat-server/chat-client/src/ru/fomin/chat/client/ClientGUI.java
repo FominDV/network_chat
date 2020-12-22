@@ -178,7 +178,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     }
 
     private void wrtMsgToLogFile(String msg) {
-        if (nickName == null) return;
+        if (nickName == null || (msg.length() >= 16 && msg.substring(10, 16).equals(SERVER))) return;
         try (FileWriter out = new FileWriter(getFilePath(), true)) {
             out.write(msg);
             out.flush();
@@ -285,8 +285,8 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             if (countOfLines >= 100) startOfReadingLines = countOfLines - 100;
             else startOfReadingLines = 0;
             for (int i = startOfReadingLines; i < countOfLines; i++) {
-                history+=lines.get(i);
-                if(i!=countOfLines-1) history+="\n";
+                history += lines.get(i);
+                if (i != countOfLines - 1) history += "\n";
             }
         } catch (IOException e) {
             System.out.println("History was not found");
