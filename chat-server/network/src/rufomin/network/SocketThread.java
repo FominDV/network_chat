@@ -3,6 +3,8 @@ package rufomin.network;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class SocketThread extends Thread {
 
@@ -10,7 +12,8 @@ public class SocketThread extends Thread {
     private final Socket socket;
     private DataOutputStream out;
     DataInputStream in;
-
+    private Base64.Encoder encoder=Base64.getEncoder();
+    private Base64.Decoder decoder=Base64.getDecoder();
     public SocketThread(SocketThreadListener listener, String name, Socket socket) {
         super(name);
         this.socket = socket;
@@ -28,14 +31,12 @@ public class SocketThread extends Thread {
             listener.onSocketReady(this, socket);
             while (!isInterrupted()) {
                 String msg = in.readUTF();
+                msg=new String(decoder.decode(msg.getBytes())) ;
                 listener.onReceiveString(this, socket, msg);
             }
         } catch (EOFException | SocketException e) {
-            // i don't like this workaround
         } catch (IOException e) {
             listener.onSocketException(this, e);
-            //methodical materials say that we should print stacktrace
-            // and do nothing on exceptions. i like it even less
         } finally {
             try {
                 socket.close();
@@ -48,6 +49,7 @@ public class SocketThread extends Thread {
 
     public synchronized boolean sendMessage(String msg) {
         try {
+            msg=encoder.encodeToString(msg.getBytes());
             out.writeUTF(msg);
             out.flush();
             return true;
