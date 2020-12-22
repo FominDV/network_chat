@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 
 public class ChangingPasswordFrame extends JFrame implements ActionListener {
     private static final String TITLE = "Edit password";
-    private static final int WIDTH = 200;
+    private static final int WIDTH = 270;
     private static final int HEIGHT = 200;
     private  final ClientGUI clientGUI;
     private static final String MESSAGE_SUCCESSFULLY_CHANGING_PASSWORD="Password was changed\n";
