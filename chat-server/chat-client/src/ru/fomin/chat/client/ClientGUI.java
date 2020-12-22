@@ -172,24 +172,14 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         }
     }
 
-    private void wrtMsgToLogFile(String msg) {
-        try (FileWriter out = new FileWriter(String.format("history_%s.txt",nickName), true)) {
-            out.write(msg + "\n");
-            out.flush();
-        } catch (IOException e) {
-            if (!shownIoErrors) {
-                shownIoErrors = true;
-                showException(Thread.currentThread(), e);
-            }
-        }
-    }
+
 
     private void putLog(String msg) {
         if ("".equals(msg)) return;
         SwingUtilities.invokeLater(() -> {
             String message=msg + "\n";
             log.append(message);
-            wrtMsgToLogFile(msg);
+            
             log.setCaretPosition(log.getDocument().getLength());
         });
     }

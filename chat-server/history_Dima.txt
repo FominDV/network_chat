@@ -1,0 +1,7 @@
+20:05:37: Server: Dima connected
+20:05:49: Server: ivan-igorevich2 connected
+20:05:51: ivan-igorevich2: wwww
+20:05:57: Dima: qqq
+20:06:42: Server: ivan-igorevich2 disconnected
+20:06:48: Server: Dima connected
+20:06:50: Dima: 2222222222222222222
