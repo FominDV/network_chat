@@ -13,7 +13,9 @@ import java.io.*;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler, SocketThreadListener {
     private static final int WIDTH = 650;
@@ -170,11 +172,13 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             socketThread.sendMessage(getTypeClientBcast(msg));
         }
     }
-private String getFilePath(){
-        return (String.format("history_%s.txt",nickName));
-}
+
+    private String getFilePath() {
+        return (String.format("history_%s.txt", nickName));
+    }
+
     private void wrtMsgToLogFile(String msg) {
-        if(nickName==null) return;
+        if (nickName == null) return;
         try (FileWriter out = new FileWriter(getFilePath(), true)) {
             out.write(msg);
             out.flush();
@@ -186,7 +190,7 @@ private String getFilePath(){
     private void putLog(String msg) {
         if ("".equals(msg)) return;
         SwingUtilities.invokeLater(() -> {
-            String message=msg + "\n";
+            String message = msg + "\n";
             log.append(message);
             wrtMsgToLogFile(message);
             log.setCaretPosition(log.getDocument().getLength());
@@ -217,15 +221,15 @@ private String getFilePath(){
         switch (msgType) {
             case AUTH_ACCEPT:
                 setTitle(WINDOW_TITLE + " entered with nickname: " + arr[1]);
-                nickName=arr[1];
-                putLog(getHistory());
+                nickName = arr[1];
+                getHistory();
                 break;
             case AUTH_DENIED:
                 putLog("Authorization failed");
-                JOptionPane.showMessageDialog(null, "Login or password is wrong!","Authorization failed",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Login or password is wrong!", "Authorization failed", JOptionPane.ERROR_MESSAGE);
                 break;
             case MSG_FORMAT_ERROR:
-                putLog(msg);
+                log.append(msg + "\n");
                 socketThread.close();
                 break;
             case TYPE_BROADCAST:
@@ -244,7 +248,7 @@ private String getFilePath(){
                         arr[2] + ": " + arr[3]);
                 break;
             case TYPE_ERROR_SENDING_YOURSELF:
-                putLog("You try to send message yourself!");
+                log.append("You try to send message yourself!\n");
                 break;
             case REGISTRATION_SUCCESSFULLY:
                 registrationFrame.registrationSuccessful();
@@ -267,17 +271,30 @@ private String getFilePath(){
         }
     }
 
-    private String getHistory() {
-        String history="";
-        try(RandomAccessFile in=new RandomAccessFile(getFilePath(),"r")){
-            in.seek(38);
-          history= in.readLine();
+    private void getHistory() {
+        String history = "";
+        try (RandomAccessFile in = new RandomAccessFile(getFilePath(), "r")) {
+            List<String> lines = new ArrayList<>();
+            String line;
+            while (true) {
+                line = in.readLine();
+                if (line != null) lines.add(line);
+                else break;
+            }
+            int startOfReadingLines, countOfLines = lines.size();
+            if (countOfLines >= 100) startOfReadingLines = countOfLines - 100;
+            else startOfReadingLines = 0;
+            for (int i = startOfReadingLines; i < countOfLines; i++) {
+                history+=lines.get(i);
+                if(i!=countOfLines-1) history+="\n";
+            }
         } catch (IOException e) {
             System.out.println("History was not found");
         }
-        return history;
+        if (!history.equals("")) log.append(history + "\n");
     }
-    private void showIoError(Exception e){
+
+    private void showIoError(Exception e) {
         if (!shownIoErrors) {
             shownIoErrors = true;
             showException(Thread.currentThread(), e);
@@ -298,12 +315,12 @@ private String getFilePath(){
 
     @Override
     public void onSocketStart(SocketThread thread, Socket socket) {
-        putLog("Start");
+        log.append("Start\n");
     }
 
     @Override
     public void onSocketStop(SocketThread thread) {
-        nickName=null;
+        nickName = null;
         try {
             registrationFrame.dispose();
         } catch (Exception e) {
@@ -317,6 +334,7 @@ private String getFilePath(){
         } catch (Exception e) {
         }
         setVisible(true);
+        log.setText("");
         cbPrivate.setText(cbPrivateText);
         panelAllBottom.setVisible(false);
         panelButtonsForEditTop.setVisible(false);
