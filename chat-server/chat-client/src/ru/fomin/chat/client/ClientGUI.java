@@ -9,8 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -171,17 +170,16 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             socketThread.sendMessage(getTypeClientBcast(msg));
         }
     }
-
+private String getFilePath(){
+        return (String.format("history_%s.txt",nickName));
+}
     private void wrtMsgToLogFile(String msg) {
         if(nickName==null) return;
-        try (FileWriter out = new FileWriter(String.format("history_%s.txt",nickName), true)) {
+        try (FileWriter out = new FileWriter(getFilePath(), true)) {
             out.write(msg);
             out.flush();
         } catch (IOException e) {
-            if (!shownIoErrors) {
-                shownIoErrors = true;
-                showException(Thread.currentThread(), e);
-            }
+            showIoError(e);
         }
     }
 
@@ -220,6 +218,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             case AUTH_ACCEPT:
                 setTitle(WINDOW_TITLE + " entered with nickname: " + arr[1]);
                 nickName=arr[1];
+                putLog(getHistory());
                 break;
             case AUTH_DENIED:
                 putLog("Authorization failed");
@@ -265,6 +264,23 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 break;
             default:
                 throw new RuntimeException("Unknown message type: " + msg);
+        }
+    }
+
+    private String getHistory() {
+        String history="";
+        try(RandomAccessFile in=new RandomAccessFile(getFilePath(),"r")){
+            in.seek(38);
+          history= in.readLine();
+        } catch (IOException e) {
+            System.out.println("History was not found");
+        }
+        return history;
+    }
+    private void showIoError(Exception e){
+        if (!shownIoErrors) {
+            shownIoErrors = true;
+            showException(Thread.currentThread(), e);
         }
     }
 
