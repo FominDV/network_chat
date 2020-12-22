@@ -177,7 +177,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         return (String.format("history_%s.txt", nickName));
     }
 
-    private void wrtMsgToLogFile(String msg) {
+    private void writeMessageToHistory(String msg) {
         if (nickName == null || (msg.length() >= 16 && msg.substring(10, 16).equals(SERVER))) return;
         try (FileWriter out = new FileWriter(getFilePath(), true)) {
             out.write(msg);
@@ -192,7 +192,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         SwingUtilities.invokeLater(() -> {
             String message = msg + "\n";
             log.append(message);
-            wrtMsgToLogFile(message);
+            writeMessageToHistory(message);
             log.setCaretPosition(log.getDocument().getLength());
         });
     }
