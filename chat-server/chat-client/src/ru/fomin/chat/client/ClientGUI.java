@@ -190,7 +190,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         SwingUtilities.invokeLater(() -> {
             String message=msg + "\n";
             log.append(message);
-            wrtMsgToLogFile(msg);
+            wrtMsgToLogFile(message);
             log.setCaretPosition(log.getDocument().getLength());
         });
     }
