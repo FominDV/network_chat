@@ -24,6 +24,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private RegistrationFrame registrationFrame;
     private ChangingNicknameFrame changingNicknameFrame;
     private ChangingPasswordFrame changingPasswordFrame;
+    private String nickName;
 
     private final JTextArea log = new JTextArea();
     private final JPanel panelTop = new JPanel(new GridLayout(2, 3));
@@ -171,9 +172,9 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         }
     }
 
-    private void wrtMsgToLogFile(String msg, String username) {
-        try (FileWriter out = new FileWriter("log.txt", true)) {
-            out.write(username + ": " + msg + "\n");
+    private void wrtMsgToLogFile(String msg) {
+        try (FileWriter out = new FileWriter(String.format("history_%s.txt",nickName), true)) {
+            out.write(msg + "\n");
             out.flush();
         } catch (IOException e) {
             if (!shownIoErrors) {
@@ -186,7 +187,9 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private void putLog(String msg) {
         if ("".equals(msg)) return;
         SwingUtilities.invokeLater(() -> {
-            log.append(msg + "\n");
+            String message=msg + "\n";
+            log.append(message);
+            wrtMsgToLogFile(msg);
             log.setCaretPosition(log.getDocument().getLength());
         });
     }
@@ -215,6 +218,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         switch (msgType) {
             case AUTH_ACCEPT:
                 setTitle(WINDOW_TITLE + " entered with nickname: " + arr[1]);
+                nickName=arr[1];
                 break;
             case AUTH_DENIED:
                 putLog("Authorization failed");
