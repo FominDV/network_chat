@@ -172,14 +172,25 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         }
     }
 
-
+    private void wrtMsgToLogFile(String msg) {
+        if(nickName==null) return;
+        try (FileWriter out = new FileWriter(String.format("history_%s.txt",nickName), true)) {
+            out.write(msg);
+            out.flush();
+        } catch (IOException e) {
+            if (!shownIoErrors) {
+                shownIoErrors = true;
+                showException(Thread.currentThread(), e);
+            }
+        }
+    }
 
     private void putLog(String msg) {
         if ("".equals(msg)) return;
         SwingUtilities.invokeLater(() -> {
             String message=msg + "\n";
             log.append(message);
-            
+            wrtMsgToLogFile(msg);
             log.setCaretPosition(log.getDocument().getLength());
         });
     }
@@ -276,6 +287,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
 
     @Override
     public void onSocketStop(SocketThread thread) {
+        nickName=null;
         try {
             registrationFrame.dispose();
         } catch (Exception e) {
