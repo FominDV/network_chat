@@ -3,17 +3,17 @@ package rufomin.network;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class SocketThread extends Thread {
-
+    private final static byte CODE_NUMBER = 77;
     private final SocketThreadListener listener;
     private final Socket socket;
     private DataOutputStream out;
     DataInputStream in;
-    private Base64.Encoder encoder=Base64.getEncoder();
-    private Base64.Decoder decoder=Base64.getDecoder();
+    private final static Base64.Encoder ENCODER = Base64.getEncoder();
+    private final static Base64.Decoder DECODER = Base64.getDecoder();
+
     public SocketThread(SocketThreadListener listener, String name, Socket socket) {
         super(name);
         this.socket = socket;
@@ -31,7 +31,7 @@ public class SocketThread extends Thread {
             listener.onSocketReady(this, socket);
             while (!isInterrupted()) {
                 String msg = in.readUTF();
-                msg=new String(decoder.decode(msg.getBytes())) ;
+                msg = decoding(msg);
                 listener.onReceiveString(this, socket, msg);
             }
         } catch (EOFException | SocketException e) {
@@ -49,7 +49,7 @@ public class SocketThread extends Thread {
 
     public synchronized boolean sendMessage(String msg) {
         try {
-            msg=encoder.encodeToString(msg.getBytes());
+            msg = encoding(msg);
             out.writeUTF(msg);
             out.flush();
             return true;
@@ -60,6 +60,23 @@ public class SocketThread extends Thread {
         }
     }
 
+    private String encoding(String msg) {
+        byte[] code = ENCODER.encode(msg.getBytes());
+        codingByteArray(code);
+        return new String(code);
+    }
+
+    private String decoding(String msg) {
+        byte[] code=msg.getBytes();
+        codingByteArray(code);
+        code=DECODER.decode(code);
+        return new String(code);
+    }
+private void codingByteArray(byte[] code){
+    for (int i = 0; i < code.length; i++) {
+        code[i] ^= CODE_NUMBER;
+    }
+}
     public synchronized void close() {
         try {
             in.close();
