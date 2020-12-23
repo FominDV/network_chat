@@ -132,7 +132,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             registrationFrame = new RegistrationFrame(this, tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
             setVisible(false);
         } else if (src == btnChangeNickname) {
-            changingNicknameFrame = new ChangingNicknameFrame(this);
+            changingNicknameFrame = new ChangingNicknameFrame(this,nickName);
             setVisible(false);
         } else if (src == btnChangePassword) {
             changingPasswordFrame = new ChangingPasswordFrame(this);
@@ -148,7 +148,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         socketThread.sendMessage(getRegistrationMessage(login, password, nickName));
     }
 
-    private boolean connect() {
+   protected boolean connect() {
         try {
             Socket socket = new Socket(tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
             socketThread = new SocketThread(this, "Client", socket);
@@ -176,7 +176,10 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         }
     }
 
-    private String getFilePath() {
+    protected String getFilePath() {
+        return (String.format("history_%s.txt", nickName));
+    }
+    protected String getFilePath(String nickName) {
         return (String.format("history_%s.txt", nickName));
     }
 
@@ -367,7 +370,10 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         showException(thread, exception);
     }
 
-    public void sendChangingNicknameMessage(String newNickname) {
+    protected void sendChangingNicknameMessage(String newNickname) {
         socketThread.sendMessage(getChangingNicknameMessage(newNickname));
+    }
+    protected void setNickName(String newNickName){
+        nickName=newNickName;
     }
 }

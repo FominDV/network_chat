@@ -1,14 +1,6 @@
-23:32:51: ivan-igorevich2: ddfd
-23:32:55: Dima: dddd
-23:33:03: ivan-igorevich2: sss
-23:33:40: ivan-igorevich2: ddddd
-23:34:05: ivan-igorevich2: sssssssssssssssssssssssssssssssssssssssssssss
-02:43:31: ivan-igorevich2: eeee
-04:40:36: tttttt: tttt
 04:41:19: ivan-igorevich2: fff
 04:41:26: tttttt: ggg
 04:41:34: tttttt: gggg
-04:44:22: ivan-igorevich2: ddd
 04:44:56: dima: ddddddddddddddddddddd
 04:45:36: dima: fffff
 04:45:52: DIMA: fffff
@@ -17,3 +9,4 @@
 04:47:46: DIMA: k
 04:47:57: DmotriyFV: '
 04:48:02: DmotriyFV: '''''o
+04:49:24: DmotriyFV: jjjj
