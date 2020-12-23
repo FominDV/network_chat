@@ -1,6 +1,5 @@
 package ru.fomin.chat.client;
 
-import static java.util.Base64.*;
 import static ru.fomin.chat.common.Library.*;
 
 import rufomin.network.SocketThread;
@@ -12,12 +11,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
 public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler, SocketThreadListener {
