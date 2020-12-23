@@ -9,12 +9,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler, SocketThreadListener {
     private static final int WIDTH = 650;
@@ -128,7 +129,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             registrationFrame = new RegistrationFrame(this, tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
             setVisible(false);
         } else if (src == btnChangeNickname) {
-            changingNicknameFrame = new ChangingNicknameFrame(this);
+            changingNicknameFrame = new ChangingNicknameFrame(this,nickName);
             setVisible(false);
         } else if (src == btnChangePassword) {
             changingPasswordFrame = new ChangingPasswordFrame(this);
@@ -144,7 +145,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         socketThread.sendMessage(getRegistrationMessage(login, password, nickName));
     }
 
-    private boolean connect() {
+   protected boolean connect() {
         try {
             Socket socket = new Socket(tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
             socketThread = new SocketThread(this, "Client", socket);
@@ -172,14 +173,29 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         }
     }
 
+    protected String getFilePath() {
+        return (String.format("history_%s.txt", nickName));
+    }
+    protected String getFilePath(String nickName) {
+        return (String.format("history_%s.txt", nickName));
+    }
 
+    private void writeMessageToHistory(String msg) {
+        if (nickName == null || (msg.length() >= 16 && msg.substring(10, 16).equals(SERVER))) return;
+        try (FileWriter out = new FileWriter(getFilePath(), true)) {
+            out.write(msg);
+            out.flush();
+        } catch (IOException e) {
+            showIoError(e);
+        }
+    }
 
     private void putLog(String msg) {
         if ("".equals(msg)) return;
         SwingUtilities.invokeLater(() -> {
-            String message=msg + "\n";
+            String message = msg + "\n";
             log.append(message);
-            
+            writeMessageToHistory(message);
             log.setCaretPosition(log.getDocument().getLength());
         });
     }
@@ -208,14 +224,15 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         switch (msgType) {
             case AUTH_ACCEPT:
                 setTitle(WINDOW_TITLE + " entered with nickname: " + arr[1]);
-                nickName=arr[1];
+                nickName = arr[1];
+                getHistory();
                 break;
             case AUTH_DENIED:
                 putLog("Authorization failed");
-                JOptionPane.showMessageDialog(null, "Login or password is wrong!","Authorization failed",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Login or password is wrong!", "Authorization failed", JOptionPane.ERROR_MESSAGE);
                 break;
             case MSG_FORMAT_ERROR:
-                putLog(msg);
+                log.append(msg + "\n");
                 socketThread.close();
                 break;
             case TYPE_BROADCAST:
@@ -234,7 +251,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                         arr[2] + ": " + arr[3]);
                 break;
             case TYPE_ERROR_SENDING_YOURSELF:
-                putLog("You try to send message yourself!");
+                log.append("You try to send message yourself!\n");
                 break;
             case REGISTRATION_SUCCESSFULLY:
                 registrationFrame.registrationSuccessful();
@@ -257,6 +274,36 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         }
     }
 
+    private void getHistory() {
+        String history = "";
+        try (RandomAccessFile in = new RandomAccessFile(getFilePath(), "r")) {
+            List<String> lines = new ArrayList<>();
+            String line;
+            while (true) {
+                line = in.readLine();
+                if (line != null) lines.add(line);
+                else break;
+            }
+            int startOfReadingLines, countOfLines = lines.size();
+            if (countOfLines >= 100) startOfReadingLines = countOfLines - 100;
+            else startOfReadingLines = 0;
+            for (int i = startOfReadingLines; i < countOfLines; i++) {
+                history += lines.get(i);
+                if (i != countOfLines - 1) history += "\n";
+            }
+        } catch (IOException e) {
+            System.out.println("History was not found");
+        }
+        if (!history.equals("")) log.append(history + "\n");
+    }
+
+    private void showIoError(Exception e) {
+        if (!shownIoErrors) {
+            shownIoErrors = true;
+            showException(Thread.currentThread(), e);
+        }
+    }
+
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         e.printStackTrace();
@@ -271,11 +318,12 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
 
     @Override
     public void onSocketStart(SocketThread thread, Socket socket) {
-        putLog("Start");
+        log.append("Start\n");
     }
 
     @Override
     public void onSocketStop(SocketThread thread) {
+        nickName = null;
         try {
             registrationFrame.dispose();
         } catch (Exception e) {
@@ -289,6 +337,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         } catch (Exception e) {
         }
         setVisible(true);
+        log.setText("");
         cbPrivate.setText(cbPrivateText);
         panelAllBottom.setVisible(false);
         panelButtonsForEditTop.setVisible(false);
@@ -318,7 +367,10 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         showException(thread, exception);
     }
 
-    public void sendChangingNicknameMessage(String newNickname) {
+    protected void sendChangingNicknameMessage(String newNickname) {
         socketThread.sendMessage(getChangingNicknameMessage(newNickname));
+    }
+    protected void setNickName(String newNickName){
+        nickName=newNickName;
     }
 }
