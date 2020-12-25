@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Base64;
 
+
 public class SocketThread extends Thread {
     private final static byte CODE_NUMBER = 77;
     private final SocketThreadListener listener;
@@ -14,11 +15,12 @@ public class SocketThread extends Thread {
     private final static Base64.Encoder ENCODER = Base64.getEncoder();
     private final static Base64.Decoder DECODER = Base64.getDecoder();
 
+
     public SocketThread(SocketThreadListener listener, String name, Socket socket) {
         super(name);
         this.socket = socket;
         this.listener = listener;
-        start();
+
     }
 
 
