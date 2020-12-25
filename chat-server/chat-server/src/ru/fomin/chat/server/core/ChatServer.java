@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ChatServer implements ServerSocketThreadListener, SocketThreadListener {
-    public static ExecutorService executorService= Executors.newCachedThreadPool();
+    public  ExecutorService executorService= Executors.newCachedThreadPool();
     private final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss: ");
     private final ChatServerListener listener;
     private final Vector<SocketThread> clients;
@@ -203,7 +203,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     public void onSocketAccepted(ServerSocketThread thread, ServerSocket server, Socket socket) {
         putLog("Client connected");
         String name = "SocketThread " + socket.getInetAddress() + ":" + socket.getPort();
-       new ClientThread(this, name, socket);
+     executorService.execute(new ClientThread(this, name, socket));
 
     }
 

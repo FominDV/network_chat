@@ -1,7 +1,5 @@
 package rufomin.network;
 
-import ru.fomin.chat.server.core.ChatServer;
-
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
@@ -22,7 +20,7 @@ public class SocketThread extends Thread {
         super(name);
         this.socket = socket;
         this.listener = listener;
-        ChatServer.executorService.execute(this);
+
     }
 
 
