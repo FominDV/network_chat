@@ -18,7 +18,7 @@ public class Task1 {
                     synchronized (lock) {
                         while (flagOfThread != number)
                             lock.wait();
-                        System.out.print((char) ('A' + flagOfThread));
+                        System.out.print((char) ('A' + number));
                         flagOfThread= (byte) (++flagOfThread % 3);
                         sleep(300);
                         lock.notifyAll();
