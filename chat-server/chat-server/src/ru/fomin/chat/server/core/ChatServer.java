@@ -13,7 +13,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class ChatServer implements ServerSocketThreadListener, SocketThreadListener {
+    public static ExecutorService executorService= Executors.newCachedThreadPool();
     private final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss: ");
     private final ChatServerListener listener;
     private final Vector<SocketThread> clients;
@@ -28,6 +32,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
         if (thread != null && thread.isAlive()) {
             putLog("Server already started");
         } else {
+            executorService= Executors.newCachedThreadPool();
             thread = new ServerSocketThread(this, "Thread of server", port, 2000);
         }
     }
@@ -36,6 +41,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
         if (thread == null || !thread.isAlive()) {
             putLog("Server is not running");
         } else {
+            executorService.shutdownNow();
             thread.interrupt();
         }
     }
@@ -168,6 +174,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     public void onServerStart(ServerSocketThread thread) {
         putLog("Server thread started");
         SqlClient.connect();
+
     }
 
     @Override
@@ -177,6 +184,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
         for (int i = 0; i < clients.size(); i++) {
             clients.get(i).close();
         }
+        executorService.shutdownNow();
     }
 
     @Override
@@ -195,7 +203,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     public void onSocketAccepted(ServerSocketThread thread, ServerSocket server, Socket socket) {
         putLog("Client connected");
         String name = "SocketThread " + socket.getInetAddress() + ":" + socket.getPort();
-        new ClientThread(this, name, socket);
+       new ClientThread(this, name, socket);
 
     }
 
@@ -224,13 +232,13 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
                     client.getNickname() + " disconnected"));
         }
         sendToAllAuthorizedClients(getUserList(getUsers()));
-
     }
 
     @Override
     public synchronized void onSocketReady(SocketThread thread, Socket socket) {
         putLog("Socket ready");
         clients.add(thread);
+
     }
 
     @Override
@@ -245,6 +253,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     @Override
     public synchronized void onSocketException(SocketThread thread, Exception exception) {
         exception.printStackTrace();
+
     }
 
 }
