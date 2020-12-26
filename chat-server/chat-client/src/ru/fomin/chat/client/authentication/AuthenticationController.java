@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 import static ru.fomin.chat.client.CommonController.showDeveloperInfo;
 
 
-public class Controller {
+public class AuthenticationController {
 
     @FXML
     private ResourceBundle resources;

@@ -6,11 +6,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class Main extends Application {
+public class AuthenticationWindow extends Application {
 static Stage authenticationFrame;
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("authentication.fxml"));
         authenticationFrame=primaryStage;
         primaryStage.setTitle("Authentication");
         primaryStage.setScene(new Scene(root, 290, 400));
