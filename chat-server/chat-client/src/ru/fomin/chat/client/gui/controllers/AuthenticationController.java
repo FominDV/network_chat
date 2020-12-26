@@ -37,13 +37,15 @@ public class AuthenticationController {
 
     @FXML
     private PasswordField field_password;
-
+    @FXML
+    private Button btnTCP_IP;
     @FXML
     void initialize() {
         btn_login.setOnAction(event -> {
                     System.out.println("login");
 
                 });
+        btnTCP_IP.setOnAction(event -> {});
 btn_info.setOnAction(event -> showDeveloperInfo());
     }
 }
