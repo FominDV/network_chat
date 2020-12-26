@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="300.0" style="-fx-background-color: #c5c7f1;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.fomin.chat.client.authentication.AuthenticationController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="300.0" style="-fx-background-color: #c5c7f1;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.fomin.chat.client.gui.controllers.AuthenticationController">
    <children>
       <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="100.0" prefWidth="300.0" style="-fx-background-color: #771aff;">
          <children>
@@ -33,6 +33,11 @@
                </image>
             </ImageView>
             <Button fx:id="btn_info" layoutY="2.0" mnemonicParsing="false" style="-fx-background-color: #7f92ff; -fx-border-color: #58ebff; -fx-border-radius: 10; -fx-background-radius: 10;" text="Developer info">
+               <font>
+                  <Font name="Arial Black" size="10.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnTCP_IP" layoutX="203.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="95.0" style="-fx-background-color: #7f92ff; -fx-border-color: #58ebff; -fx-border-radius: 10; -fx-background-radius: 10;" text="TCP/IP">
                <font>
                   <Font name="Arial Black" size="10.0" />
                </font>

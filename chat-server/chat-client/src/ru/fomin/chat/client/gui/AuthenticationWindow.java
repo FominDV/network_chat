@@ -1,4 +1,4 @@
-package ru.fomin.chat.client.authentication;
+package ru.fomin.chat.client.gui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -7,11 +7,9 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class AuthenticationWindow extends Application {
-static Stage authenticationFrame;
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("authentication.fxml"));
-        authenticationFrame=primaryStage;
+        Parent root = FXMLLoader.load(getClass().getResource("fxml/authentication.fxml"));
         primaryStage.setTitle("Authentication");
         primaryStage.setScene(new Scene(root, 290, 400));
         primaryStage.show();

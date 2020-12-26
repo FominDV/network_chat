@@ -1,23 +1,17 @@
-package ru.fomin.chat.client.authentication;
+package ru.fomin.chat.client.gui.controllers;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import static ru.fomin.chat.client.CommonController.showDeveloperInfo;
+import static ru.fomin.chat.client.gui.controllers.CommonCommands.*;
 
 
 public class AuthenticationController {
-
     @FXML
     private ResourceBundle resources;
     @FXML
@@ -39,13 +33,17 @@ public class AuthenticationController {
     private PasswordField field_password;
     @FXML
     private Button btnTCP_IP;
+
     @FXML
     void initialize() {
         btn_login.setOnAction(event -> {
-                    System.out.println("login");
+            System.out.println("login");
 
-                });
-        btnTCP_IP.setOnAction(event -> {});
-btn_info.setOnAction(event -> showDeveloperInfo());
+        });
+        btnTCP_IP.setOnAction(event -> {
+            btnTCP_IP.getScene().getWindow().hide();
+           showStage("/ru/fomin/chat/client/gui/fxml/connection_properties.fxml");
+        });
+        btn_info.setOnAction(event -> showDeveloperInfo());
     }
 }
