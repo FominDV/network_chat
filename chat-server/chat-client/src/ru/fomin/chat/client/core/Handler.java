@@ -51,9 +51,11 @@ public class Handler implements SocketThreadListener {
         String msgType = arr[0];
         switch (msgType) {
             case AUTH_ACCEPT:
-                // setTitle(WINDOW_TITLE + " entered with nickname: " + arr[1]);
-                nickName = arr[1];
-                getHistory();
+                Platform.runLater(() -> {
+                    nickName = arr[1];
+                    chatController.setTitle(arr[1]);
+                    chatController.appendToLog( getHistory());
+                });
                 break;
             case AUTH_DENIED:
                 // putLog("Authorization failed");
@@ -158,6 +160,7 @@ public class Handler implements SocketThreadListener {
 
     @Override
     public void onSocketReady(SocketThread thread, Socket socket) {
+      Platform.runLater(()->chatController.appendToLog("Start\n"));
     }
 
     @Override
@@ -195,5 +198,8 @@ public class Handler implements SocketThreadListener {
         this.chatController = chatController;
     }
 
+    public void sendMessage(String message) {
+        socketThread.sendMessage(message);
+    }
 
 }

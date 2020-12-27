@@ -9,6 +9,7 @@ import ru.fomin.chat.client.core.Handler;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static ru.fomin.chat.common.Library.*;
 import static ru.fomin.chat.client.gui.controllers.CommonCommands.*;
 
 
@@ -54,16 +55,26 @@ public class AuthenticationController {
         });
         btn_registration.setOnAction(event -> {
             connect();
-            if(isConnected)
+            if (isConnected)
                 showAndHideStages("/ru/fomin/chat/client/gui/fxml/registration.fxml", btnTCP_IP);
         });
         btn_login.setOnAction(event -> {
             connect();
-            if(isConnected)
-            showAndHideStages("/ru/fomin/chat/client/gui/fxml/chat.fxml", btn_login);
+            String login = field_login.getText(), password = field_password.getText();
+            if (isConnected && isValidField(login, password)) {
+                showAndHideStages("/ru/fomin/chat/client/gui/fxml/chat.fxml", btn_login);
+                handler.sendMessage(getAuthRequest(login, password));
+            }
         });
         btnTCP_IP.setOnAction(event -> showAndHideStages("/ru/fomin/chat/client/gui/fxml/connection_properties.fxml", btnTCP_IP));
         btn_info.setOnAction(event -> showDeveloperInfo());
+    }
+
+    private boolean isValidField(String login, String password) {
+        if (login.equals("") || password.equals("")) {
+            showErrorMessage("All fields should be filled");
+            return false;
+        } else return true;
     }
 
     private void connect() {

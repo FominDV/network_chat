@@ -42,7 +42,7 @@ public final class CommonCommands {
         getStage(pathOfFXML).hide();
     }
 
-    private static Stage getStage(String pathOfFXML) {
+     static Stage getStage(String pathOfFXML) {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(CommonCommands.class.getResource(pathOfFXML));
         try {
