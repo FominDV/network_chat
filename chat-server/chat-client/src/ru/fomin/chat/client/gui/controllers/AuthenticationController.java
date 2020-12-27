@@ -67,7 +67,7 @@ public class AuthenticationController {
        if(isConnected) isConnected=false;else isConnected=true;
     }
 public  void reload(){
-        registrationController.exit();
+        registrationController.returnToAuthentication();
 }
 static void socketTreadStop(){
         handler.stopSocketThread();
