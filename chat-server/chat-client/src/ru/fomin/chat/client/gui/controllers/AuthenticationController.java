@@ -13,15 +13,17 @@ import static ru.fomin.chat.client.gui.controllers.CommonCommands.*;
 
 
 public class AuthenticationController {
-   static RegistrationController registrationController;
-    private boolean isConnected=false;
-   static private Handler handler;
-    static String ip="127.0.0.1";
-    static int port=8189;
-    static void setConnectionProperties(String ip, int port){
-        AuthenticationController.ip=ip;
-        AuthenticationController.port=port;
+    static RegistrationController registrationController;
+    private boolean isConnected = false;
+    static Handler handler;
+    static String ip = "127.0.0.1";
+    static int port = 8189;
+
+    static void setConnectionProperties(String ip, int port) {
+        AuthenticationController.ip = ip;
+        AuthenticationController.port = port;
     }
+
     @FXML
     private ResourceBundle resources;
     @FXML
@@ -51,25 +53,41 @@ public class AuthenticationController {
 
         });
         btn_registration.setOnAction(event -> {
-            showAndHideStages("/ru/fomin/chat/client/gui/fxml/registration.fxml",btnTCP_IP);
             connect();
+            if(isConnected)
+                showAndHideStages("/ru/fomin/chat/client/gui/fxml/registration.fxml", btnTCP_IP);
+        });
+        btn_login.setOnAction(event -> {
+            connect();
+            if(isConnected)
+            showAndHideStages("/ru/fomin/chat/client/gui/fxml/chat.fxml", btn_login);
         });
         btnTCP_IP.setOnAction(event -> showAndHideStages("/ru/fomin/chat/client/gui/fxml/connection_properties.fxml", btnTCP_IP));
         btn_info.setOnAction(event -> showDeveloperInfo());
     }
-    private void connect(){
-        if(!isConnected){
-            isConnected=true;
-        handler=new Handler(port,ip,this);
-       }
+
+    private void connect() {
+        if (!isConnected) {
+            isConnected = true;
+            handler = new Handler(port, ip, this);
+        }
     }
-    public void changeIsConnected(){
-       if(isConnected) isConnected=false;else isConnected=true;
+
+    public void changeIsConnected() {
+        if (isConnected) isConnected = false;
+        else isConnected = true;
     }
-public  void reload(){
-        registrationController.returnToAuthentication();
-}
-static void socketTreadStop(){
+
+    public void reload() {
+        try {
+            registrationController.returnToAuthentication();
+        } catch (NullPointerException e) {
+            showStage("/ru/fomin/chat/client/gui/fxml/authentication.fxml");
+        }
+
+    }
+
+    static void socketTreadStop() {
         handler.stopSocketThread();
-}
+    }
 }

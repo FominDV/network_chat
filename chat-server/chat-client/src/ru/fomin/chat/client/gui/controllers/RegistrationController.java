@@ -45,5 +45,7 @@ AuthenticationController.registrationController=this;
     public void returnToAuthentication(){
         showAndHideStages("/ru/fomin/chat/client/gui/fxml/authentication.fxml", btn_cancel);
     }
+
+
 }
 

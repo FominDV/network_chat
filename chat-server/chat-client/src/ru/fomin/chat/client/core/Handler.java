@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import ru.fomin.chat.client.gui.controllers.AuthenticationController;
+import ru.fomin.chat.client.gui.controllers.ChatController;
 import ru.fomin.chat.client.gui.controllers.CommonCommands;
 import ru.fomin.chat.client.gui.controllers.RegistrationController;
 import rufomin.network.SocketThread;
@@ -31,22 +32,18 @@ public class Handler implements SocketThreadListener {
     private SocketThread socketThread;
     private String nickName;
     private AuthenticationController authenticationController;
-
+    private ChatController chatController;
 
     public Handler(int port, String ip, AuthenticationController authenticationController) {
-        this.authenticationController=authenticationController;
+        this.authenticationController = authenticationController;
         try {
             Socket socket = new Socket(ip, port);
             socketThread = new SocketThread(this, "Client", socket);
         } catch (IOException e) {
-           Platform.runLater(()->{
-                this.authenticationController.reload();
-            });
             authenticationController.changeIsConnected();
             showConnectionError();
         }
     }
-
 
 
     private void handleMessage(String msg) {
@@ -121,7 +118,7 @@ public class Handler implements SocketThreadListener {
             if (countOfLines >= 100) startOfReadingLines = countOfLines - 100;
             else startOfReadingLines = 0;
             for (int i = startOfReadingLines; i < countOfLines; i++) {
-                history += lines.get(i)+"\n";
+                history += lines.get(i) + "\n";
             }
         } catch (IOException e) {
             System.out.println("History was not found");
@@ -145,8 +142,13 @@ public class Handler implements SocketThreadListener {
     @Override
     public void onSocketStop(SocketThread thread) {
         authenticationController.changeIsConnected();
-        Platform.runLater(()->{
-authenticationController.reload();
+        Platform.runLater(() -> {
+            authenticationController.reload();
+            try {
+                chatController.hide();
+            } catch (NullPointerException e) {
+
+            }
         });
 
 
@@ -185,7 +187,13 @@ authenticationController.reload();
         socketThread.sendMessage(getAuthRequest(login, password));
     }
 
-public void stopSocketThread(){
+    public void stopSocketThread() {
         socketThread.close();
-}
+    }
+
+    public void setChatController(ChatController chatController) {
+        this.chatController = chatController;
+    }
+
+
 }
