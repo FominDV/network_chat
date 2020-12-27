@@ -14,6 +14,10 @@ import static ru.fomin.chat.client.gui.controllers.CommonCommands.*;
 public class AuthenticationController {
     static String ip="127.0.0.1";
     static int port=8189;
+    static void setConnectionProperties(String ip, int port){
+        AuthenticationController.ip=ip;
+        AuthenticationController.port=port;
+    }
     @FXML
     private ResourceBundle resources;
     @FXML

@@ -32,4 +32,7 @@ public final class CommonCommands {
         stage.setResizable(false);
         stage.show();
     }
+    static void showErrorMessage(String message){
+        JOptionPane.showMessageDialog(null,message,"ERROR",JOptionPane.ERROR_MESSAGE);
+    }
 }
