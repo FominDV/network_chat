@@ -1,6 +1,12 @@
 package ru.fomin.chat.client.core;
 
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import ru.fomin.chat.client.gui.controllers.AuthenticationController;
+import ru.fomin.chat.client.gui.controllers.CommonCommands;
 import ru.fomin.chat.client.gui.controllers.RegistrationController;
 import rufomin.network.SocketThread;
 import rufomin.network.SocketThreadListener;
@@ -136,6 +142,9 @@ public class Handler implements SocketThreadListener {
     @Override
     public void onSocketStop(SocketThread thread) {
         authenticationController.changeIsConnected();
+        Platform.runLater(()->{
+            
+        });
 
 
         nickName = null;
