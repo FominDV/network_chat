@@ -1,5 +1,7 @@
 package ru.fomin.chat.client.gui.controllers;
 
+import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,6 +21,28 @@ public final class CommonCommands {
 
     static void showAndHideStages(String pathOfFXML, Labeled labeled) {
         labeled.getScene().getWindow().hide();
+        Stage stage = getStage(pathOfFXML);
+        stage.setResizable(false);
+        stage.setOnCloseRequest(event -> {
+            Platform.exit();
+            System.exit(0);
+        });
+        stage.show();
+    }
+
+    static void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(null, message, "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+
+    static void showStage(String pathOfFXML) {
+        getStage(pathOfFXML).show();
+    }
+
+    static void hideStage(String pathOfFXML) {
+        getStage(pathOfFXML).hide();
+    }
+
+    private static Stage getStage(String pathOfFXML) {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(CommonCommands.class.getResource(pathOfFXML));
         try {
@@ -29,13 +53,6 @@ public final class CommonCommands {
         Parent root = loader.getRoot();
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
-        stage.setResizable(false);
-        stage.show();
+        return stage;
     }
-
-    static void showErrorMessage(String message) {
-        JOptionPane.showMessageDialog(null, message, "ERROR", JOptionPane.ERROR_MESSAGE);
-    }
-
-
 }

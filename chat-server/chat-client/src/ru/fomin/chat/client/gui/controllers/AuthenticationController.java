@@ -13,6 +13,7 @@ import static ru.fomin.chat.client.gui.controllers.CommonCommands.*;
 
 
 public class AuthenticationController {
+   static RegistrationController registrationController;
     private boolean isConnected=false;
    static private Handler handler;
     static String ip="127.0.0.1";
@@ -50,8 +51,8 @@ public class AuthenticationController {
 
         });
         btn_registration.setOnAction(event -> {
-            connect();
             showAndHideStages("/ru/fomin/chat/client/gui/fxml/registration.fxml",btnTCP_IP);
+            connect();
         });
         btnTCP_IP.setOnAction(event -> showAndHideStages("/ru/fomin/chat/client/gui/fxml/connection_properties.fxml", btnTCP_IP));
         btn_info.setOnAction(event -> showDeveloperInfo());
@@ -65,6 +66,10 @@ public class AuthenticationController {
     public void changeIsConnected(){
        if(isConnected) isConnected=false;else isConnected=true;
     }
-
-
+public  void reload(){
+        registrationController.exit();
+}
+static void socketTreadStop(){
+        handler.stopSocketThread();
+}
 }

@@ -39,6 +39,9 @@ public class Handler implements SocketThreadListener {
             Socket socket = new Socket(ip, port);
             socketThread = new SocketThread(this, "Client", socket);
         } catch (IOException e) {
+           Platform.runLater(()->{
+                this.authenticationController.reload();
+            });
             authenticationController.changeIsConnected();
             showConnectionError();
         }
@@ -143,7 +146,7 @@ public class Handler implements SocketThreadListener {
     public void onSocketStop(SocketThread thread) {
         authenticationController.changeIsConnected();
         Platform.runLater(()->{
-            
+authenticationController.reload();
         });
 
 
@@ -182,5 +185,7 @@ public class Handler implements SocketThreadListener {
         socketThread.sendMessage(getAuthRequest(login, password));
     }
 
-
+public void stopSocketThread(){
+        socketThread.close();
+}
 }
