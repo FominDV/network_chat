@@ -68,7 +68,7 @@ public class ConnectionPropertiesController {
             showErrorMessage("The port should be less than 65536 and greater than zero");
             return false;
         }
-        if(!ip.matches("(\\d{1,3}\\.){3}\\d{1,3}")){
+        if(!ip.matches("(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[0-9]{2}|[0-9])(\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[0-9]{2}|[0-9])){3}")){
             showErrorMessage("Invalid IP: "+ip);
             return false;
         }
@@ -78,5 +78,6 @@ public class ConnectionPropertiesController {
     private void exit() {
         showAndHideStages("/ru/fomin/chat/client/gui/fxml/authentication.fxml", btn_cancel);
     }
+
 }
 

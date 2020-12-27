@@ -1,11 +1,15 @@
 package ru.fomin.chat.client.core;
 
+import ru.fomin.chat.client.gui.controllers.AuthenticationController;
+import ru.fomin.chat.client.gui.controllers.RegistrationController;
 import rufomin.network.SocketThread;
 import rufomin.network.SocketThreadListener;
 
+import static ru.fomin.chat.client.gui.controllers.CommonCommands.*;
 import static ru.fomin.chat.common.Library.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -17,87 +21,81 @@ import java.util.List;
 
 import static ru.fomin.chat.common.Library.*;
 
-public class Handler implements ActionListener,  SocketThreadListener {
+public class Handler implements SocketThreadListener {
     private SocketThread socketThread;
     private String nickName;
+    private AuthenticationController authenticationController;
 
-    public Handler(int port, String ip) {
+
+    public Handler(int port, String ip, AuthenticationController authenticationController) {
+        this.authenticationController=authenticationController;
         try {
             Socket socket = new Socket(ip, port);
             socketThread = new SocketThread(this, "Client", socket);
         } catch (IOException e) {
-            showException(Thread.currentThread(), e);
+            authenticationController.changeIsConnected();
+            showConnectionError();
         }
     }
+
+
 
     private void handleMessage(String msg) {
         String[] arr = msg.split(DELIMITER);
         String msgType = arr[0];
         switch (msgType) {
             case AUTH_ACCEPT:
-               // setTitle(WINDOW_TITLE + " entered with nickname: " + arr[1]);
+                // setTitle(WINDOW_TITLE + " entered with nickname: " + arr[1]);
                 nickName = arr[1];
                 getHistory();
                 break;
             case AUTH_DENIED:
-               // putLog("Authorization failed");
+                // putLog("Authorization failed");
                 JOptionPane.showMessageDialog(null, "Login or password is wrong!", "Authorization failed", JOptionPane.ERROR_MESSAGE);
                 break;
             case MSG_FORMAT_ERROR:
-              //  log.append(msg + "\n");
+                //  log.append(msg + "\n");
                 socketThread.close();
                 break;
             case TYPE_BROADCAST:
-             //   putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) +
-                   //     arr[2] + ": " + arr[3]);
+                //   putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) +
+                //     arr[2] + ": " + arr[3]);
                 break;
             case USER_LIST:
                 msg = msg.substring(USER_LIST.length() + DELIMITER.length());
                 String[] usersArray = msg.split(DELIMITER);
                 Arrays.sort(usersArray);
-              //  userList.setListData(usersArray);
-             //   if (userList.getSelectedValue() == null) userList.setSelectedIndex(0);
+                //  userList.setListData(usersArray);
+                //   if (userList.getSelectedValue() == null) userList.setSelectedIndex(0);
                 break;
             case TYPE_PRIVATE:
-               // putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) + "private from " +
-                     //  arr[2] + ": " + arr[3]);
+                // putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) + "private from " +
+                //  arr[2] + ": " + arr[3]);
                 break;
             case TYPE_ERROR_SENDING_YOURSELF:
-               // log.append("You try to send message yourself!\n");
+                // log.append("You try to send message yourself!\n");
                 break;
             case REGISTRATION_SUCCESSFULLY:
-              //  registrationFrame.registrationSuccessful();
-               // isRegistrationProcess = false;
+                //  registrationFrame.registrationSuccessful();
+                // isRegistrationProcess = false;
                 break;
             case REGISTRATION_NOT_SUCCESSFULLY:
-              //  registrationFrame.registrationNotSuccessful();
+                //  registrationFrame.registrationNotSuccessful();
                 break;
             case NICKNAME_WAS_CHANGED:
-              //  changingNicknameFrame.changingSuccessful();
+                //  changingNicknameFrame.changingSuccessful();
                 break;
             case CHANGING_PASSWORD:
-              //  changingPasswordFrame.changingSuccessful();
+                //  changingPasswordFrame.changingSuccessful();
                 break;
             case CHANGING_PASSWORD_ERROR:
-              //  changingPasswordFrame.changingFailed();
+                //  changingPasswordFrame.changingFailed();
                 break;
             default:
                 throw new RuntimeException("Unknown message type: " + msg);
         }
     }
 
-    private void showException(Thread t, Throwable e) {
-        String msg;
-        StackTraceElement[] ste = e.getStackTrace();
-        if (ste.length == 0)
-            msg = "Empty Stacktrace";
-        else {
-            msg = String.format("Exception in \"%s\" %s: %s\n\tat %s",
-                    t.getName(), e.getClass().getCanonicalName(), e.getMessage(), ste[0]);
-            JOptionPane.showMessageDialog(null, msg, "Exception", JOptionPane.ERROR_MESSAGE);
-        }
-        JOptionPane.showMessageDialog(null, msg, "Exception", JOptionPane.ERROR_MESSAGE);
-    }
 
     private String getHistory() {
         String history = "";
@@ -114,13 +112,12 @@ public class Handler implements ActionListener,  SocketThreadListener {
             if (countOfLines >= 100) startOfReadingLines = countOfLines - 100;
             else startOfReadingLines = 0;
             for (int i = startOfReadingLines; i < countOfLines; i++) {
-                history += lines.get(i);
-                if (i != countOfLines - 1) history += "\n";
+                history += lines.get(i)+"\n";
             }
         } catch (IOException e) {
             System.out.println("History was not found");
         }
-        return (history + "\n");
+        return (history);
     }
 
     protected String getFilePath() {
@@ -132,34 +129,49 @@ public class Handler implements ActionListener,  SocketThreadListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
-
-
-
-    @Override
     public void onSocketStart(SocketThread thread, Socket socket) {
 
     }
 
     @Override
     public void onSocketStop(SocketThread thread) {
+        authenticationController.changeIsConnected();
+
+
+        nickName = null;
 
     }
 
     @Override
     public void onSocketReady(SocketThread thread, Socket socket) {
-
     }
 
     @Override
     public void onReceiveString(SocketThread thread, Socket socket, String msg) {
-
+        handleMessage(msg);
     }
 
     @Override
     public void onSocketException(SocketThread thread, Exception exception) {
-
+        authenticationController.changeIsConnected();
+        showConnectionError();
     }
+
+    private void showConnectionError() {
+        JOptionPane.showMessageDialog(null, "Connection was lost", "Connection ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void sendChangingNicknameMessage(String newNickname) {
+        socketThread.sendMessage(getChangingNicknameMessage(newNickname));
+    }
+
+    public void setNickName(String newNickName) {
+        nickName = newNickName;
+    }
+
+    public void logIn(String login, String password) {
+        socketThread.sendMessage(getAuthRequest(login, password));
+    }
+
+
 }

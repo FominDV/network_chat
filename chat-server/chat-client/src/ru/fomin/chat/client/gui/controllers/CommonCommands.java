@@ -11,14 +11,14 @@ import javax.swing.*;
 import java.io.IOException;
 
 public final class CommonCommands {
-    static void showDeveloperInfo() {
+    public static void showDeveloperInfo() {
         JOptionPane.showMessageDialog(null,
                 "<html>Developer: Dmitriy Fomin<br>GitHub: https://github.com/FominDV <br> Email: 79067773397@yandex.ru<br>*All rights reserved*</html>",
                 "Developer info", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    static void showAndHideStages(String pathOfFXML, Labeled o) {
-        o.getScene().getWindow().hide();
+    static void showAndHideStages(String pathOfFXML, Labeled labeled) {
+        labeled.getScene().getWindow().hide();
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(CommonCommands.class.getResource(pathOfFXML));
         try {
@@ -32,7 +32,10 @@ public final class CommonCommands {
         stage.setResizable(false);
         stage.show();
     }
-    static void showErrorMessage(String message){
-        JOptionPane.showMessageDialog(null,message,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+    static void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(null, message, "ERROR", JOptionPane.ERROR_MESSAGE);
     }
+
+
 }
