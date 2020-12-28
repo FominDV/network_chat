@@ -101,9 +101,8 @@ public class ChatController {
     }
 
     public void setHistoryToLog(String history) {
-        Platform.runLater(() -> {
-            log.appendText(history);
-        });
+      log.appendText(history);
+        log.positionCaret(log.getLength());
     }
 
     public void setUsersList(String[] usersArray) {

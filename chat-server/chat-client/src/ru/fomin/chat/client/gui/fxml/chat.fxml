@@ -4,6 +4,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.Blend?>
@@ -61,7 +62,6 @@
             <Font name="Impact" size="18.0" />
          </font>
       </CheckBox>
-      <TextArea fx:id="log" editable="false" layoutX="132.0" layoutY="100.0" prefHeight="236.0" prefWidth="343.0" wrapText="true" />
       <Button fx:id="btn_change_password" layoutX="3.0" layoutY="100.0" mnemonicParsing="false" prefHeight="109.0" prefWidth="125.0" style="-fx-background-color: #7fcfff; -fx-border-color: #0c2dff; -fx-border-radius: 6;" text="Change&#10;Password&#10;" textFill="#244bd7">
          <font>
             <Font name="Impact" size="20.0" />
@@ -77,6 +77,18 @@
             <Font name="Impact" size="21.0" />
          </font>
       </Label>
-      <ListView fx:id="users_list" layoutX="480.0" layoutY="164.0" prefHeight="171.0" prefWidth="177.0" />
+      <ScrollPane hbarPolicy="NEVER" layoutX="135.0" layoutY="100.0" pickOnBounds="false" prefHeight="235.0" prefWidth="337.0">
+         <content>
+            <TextArea fx:id="log" editable="false" prefHeight="233.0" prefWidth="322.0" wrapText="true">
+               <font>
+                  <Font name="Times New Roman" size="14.0" />
+               </font></TextArea>
+         </content>
+      </ScrollPane>
+      <ScrollPane layoutX="475.0" layoutY="164.0" prefHeight="173.0" prefWidth="183.0">
+         <content>
+            <ListView fx:id="users_list" prefHeight="171.0" prefWidth="177.0" />
+         </content>
+      </ScrollPane>
     </children>
 </AnchorPane>
