@@ -73,8 +73,7 @@ public class Handler implements SocketThreadListener {
                 msg = msg.substring(USER_LIST.length() + DELIMITER.length());
                 String[] usersArray = msg.split(DELIMITER);
                 Arrays.sort(usersArray);
-                //  userList.setListData(usersArray);
-                //   if (userList.getSelectedValue() == null) userList.setSelectedIndex(0);
+                Platform.runLater(()-> chatController.setUsersList(usersArray) );
                 break;
             case TYPE_PRIVATE:
                 // putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) + "private from " +

@@ -47,33 +47,33 @@
             </ImageView>
             </children>
         </AnchorPane>
-        <Button fx:id="btn_change" layoutX="498.0" layoutY="346.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="159.0" style="-fx-background-color: #7fcfff; -fx-border-color: #0c2dff; -fx-border-radius: 6;" text="change" textFill="#244bd7">
+        <Button fx:id="btn_send" layoutX="541.0" layoutY="346.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="116.0" style="-fx-background-color: #7fcfff; -fx-border-color: #0c2dff; -fx-border-radius: 6;" text="send" textFill="#244bd7">
             <font>
                 <Font name="Impact" size="20.0" />
             </font>
         </Button>
-        <TextField fx:id="field_ip" focusTraversable="false" layoutX="3.0" layoutY="346.0" prefHeight="40.0" prefWidth="493.0" promptText="your message" style="-fx-border-color: #0c2dff; -fx-border-radius: 6;">
+        <TextField fx:id="field_message" focusTraversable="false" layoutX="3.0" layoutY="346.0" prefHeight="40.0" prefWidth="537.0" promptText="your message" style="-fx-border-color: #0c2dff; -fx-border-radius: 6;">
             <font>
                 <Font name="Times New Roman Italic" size="18.0" />
             </font>
         </TextField>
-      <CheckBox layoutX="475.0" layoutY="100.0" mnemonicParsing="false" text="Private message" textFill="#1856c9">
+      <CheckBox fx:id="cb_private" layoutX="475.0" layoutY="100.0" mnemonicParsing="false" text="Private message" textFill="#1856c9">
          <font>
             <Font name="Impact" size="18.0" />
          </font>
       </CheckBox>
       <ScrollPane layoutX="475.0" layoutY="164.0" prefHeight="172.0" prefWidth="182.0">
          <content>
-            <ListView prefHeight="200.0" prefWidth="200.0" />
+            <ListView fx:id="users_list" prefHeight="200.0" prefWidth="200.0" />
          </content>
       </ScrollPane>
       <TextArea fx:id="log" layoutX="132.0" layoutY="100.0" prefHeight="236.0" prefWidth="343.0" />
-      <Button fx:id="btn_change1" layoutX="3.0" layoutY="100.0" mnemonicParsing="false" prefHeight="109.0" prefWidth="125.0" style="-fx-background-color: #7fcfff; -fx-border-color: #0c2dff; -fx-border-radius: 6;" text="Change&#10;Password&#10;" textFill="#244bd7">
+      <Button fx:id="btn_change_password" layoutX="3.0" layoutY="100.0" mnemonicParsing="false" prefHeight="109.0" prefWidth="125.0" style="-fx-background-color: #7fcfff; -fx-border-color: #0c2dff; -fx-border-radius: 6;" text="Change&#10;Password&#10;" textFill="#244bd7">
          <font>
             <Font name="Impact" size="20.0" />
          </font>
       </Button>
-      <Button fx:id="btn_change11" alignment="CENTER" contentDisplay="CENTER" layoutX="3.0" layoutY="228.0" mnemonicParsing="false" prefHeight="109.0" prefWidth="125.0" style="-fx-background-color: #7fcfff; -fx-border-color: #0c2dff; -fx-border-radius: 6;" text="Change&#10;Nickname" textFill="#244bd7">
+      <Button fx:id="btn_change_nickname" alignment="CENTER" contentDisplay="CENTER" layoutX="3.0" layoutY="228.0" mnemonicParsing="false" prefHeight="109.0" prefWidth="125.0" style="-fx-background-color: #7fcfff; -fx-border-color: #0c2dff; -fx-border-radius: 6;" text="Change&#10;Nickname" textFill="#244bd7">
          <font>
             <Font name="Impact" size="20.0" />
          </font>

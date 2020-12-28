@@ -37,10 +37,7 @@ AuthenticationController.registrationController=this;
         btn_cancel.setOnAction(event -> exit());
     }
     public void exit() {
-        try {
             AuthenticationController.socketTreadStop();
-        }catch (NullPointerException e){
-        }
     }
     public void returnToAuthentication(){
         showAndHideStages("/ru/fomin/chat/client/gui/fxml/authentication.fxml", btn_cancel);
