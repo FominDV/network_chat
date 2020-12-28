@@ -71,9 +71,7 @@ public class SocketThread extends Thread {
     }
     static private String coding(String message){
         byte[] bytes=message.getBytes(StandardCharsets.UTF_16);
-        for(int i=0;i<bytes.length;i++) bytes[i]^=KEY;
-        byte[] bytes1=new byte[bytes.length-2];
-        for(int i=0;i<bytes1.length;i++) bytes1[i]=bytes[i+2];
-        return new String(bytes1, StandardCharsets.UTF_16);
+        for(int i=2;i<bytes.length;i++) bytes[i]^=KEY;
+        return new String(bytes, StandardCharsets.UTF_16);
     }
 }
