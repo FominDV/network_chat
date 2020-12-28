@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: ru.geekbrains.java_two.lesson_d.online.ServerGUI
-

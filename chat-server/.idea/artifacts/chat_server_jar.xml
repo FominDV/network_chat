@@ -2,14 +2,9 @@
   <artifact type="jar" name="chat-server:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/chat_server_jar</output-path>
     <root id="archive" name="chat-server.jar">
-      <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/network/src/META-INF/MANIFEST.MF" />
-      </element>
-      <element id="module-output" name="J2_Stream200925" />
-      <element id="module-output" name="chat-client" />
+      <element id="module-output" name="chat-server" />
       <element id="module-output" name="common" />
       <element id="module-output" name="network" />
-      <element id="module-output" name="chat-server" />
       <element id="extracted-dir" path="$PROJECT_DIR$/chat-server/sqlite-jdbc-3.32.3.jar" path-in-jar="/" />
     </root>
   </artifact>
