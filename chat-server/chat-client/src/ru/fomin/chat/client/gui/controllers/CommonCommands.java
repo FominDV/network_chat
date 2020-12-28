@@ -2,12 +2,14 @@ package ru.fomin.chat.client.gui.controllers;
 
 import javafx.application.Platform;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Labeled;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -35,7 +37,10 @@ public final class CommonCommands {
     }
 
     static void showStage(String pathOfFXML) {
-        getStage(pathOfFXML).show();
+        Stage stage=getStage(pathOfFXML);
+        stage.setResizable(false);
+        stage.setOnCloseRequest(event -> event.consume());
+        stage.show();
     }
 
     static void hideStage(String pathOfFXML) {

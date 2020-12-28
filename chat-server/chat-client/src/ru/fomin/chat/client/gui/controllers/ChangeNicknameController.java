@@ -1,8 +1,11 @@
 package ru.fomin.chat.client.gui.controllers;
 
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.stage.WindowEvent;
 import ru.fomin.chat.client.core.Handler;
 import ru.fomin.chat.common.Library;
 
@@ -53,6 +56,7 @@ private String newNickname;
     }
 
     private void exit(){
+        ChatController.isChangingNicknameOpened=false;
         btn_change.getScene().getWindow().hide();
     }
 

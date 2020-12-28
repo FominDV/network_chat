@@ -1,5 +1,6 @@
 package ru.fomin.chat.client.gui.controllers;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,7 +16,8 @@ import static ru.fomin.chat.common.Library.getTypeClientBcast;
 import static ru.fomin.chat.common.Library.getTypeClientPrivate;
 
 public class ChatController {
-private MultipleSelectionModel<String> multipleSelectionModel;
+    static boolean isChangingNicknameOpened = false;
+    private MultipleSelectionModel<String> multipleSelectionModel;
     @FXML
     private Label title;
 
@@ -53,14 +55,21 @@ private MultipleSelectionModel<String> multipleSelectionModel;
         btn_cancel.setOnAction(event -> exit());
         btn_send.setOnAction(event -> sendMessage());
         field_message.setOnAction(event -> sendMessage());
-        btn_change_nickname.setOnAction(event ->showStage("/ru/fomin/chat/client/gui/fxml/change_nickname.fxml"));
+        btn_change_nickname.setOnAction(event -> {
+            if (!isChangingNicknameOpened) {
+                isChangingNicknameOpened = true;
+                showStage("/ru/fomin/chat/client/gui/fxml/change_nickname.fxml");
+            }
+        });
     }
 
     private void sendMessage() {
         String msg = field_message.getText();
         field_message.setText("");
         field_message.requestFocus();
-        if (msg.matches("\\s*")){ return;}
+        if (msg.matches("\\s*")) {
+            return;
+        }
         if (cb_private.isSelected()) {
             if (!(multipleSelectionModel.getSelectedItem() == null)) {
                 AuthenticationController.handler.sendMessage(getTypeClientPrivate(multipleSelectionModel.getSelectedItem(), msg));
@@ -76,24 +85,32 @@ private MultipleSelectionModel<String> multipleSelectionModel;
     public void hide() {
         btn_info.getScene().getWindow().hide();
     }
+
     public void setTitle(String nickname) {
-        title.setText(title.getText()+nickname);
+        title.setText(title.getText() + nickname);
     }
-    private void exit(){
+
+    private void exit() {
         AuthenticationController.handler.stopSocketThread();
     }
 
-    public void appendToLog(String message){
-        message+="\n";
+    public void appendToLog(String message) {
+        message += "\n";
         log.appendText(message);
         Handler.writeMessageToHistory(message);
     }
 
+    public void setHistoryToLog(String history) {
+        Platform.runLater(() -> {
+            log.appendText(history);
+        });
+    }
+
     public void setUsersList(String[] usersArray) {
-        ObservableList<String> observableList= FXCollections.observableArrayList(usersArray);
+        ObservableList<String> observableList = FXCollections.observableArrayList(usersArray);
         users_list.setItems(observableList);
-        multipleSelectionModel=users_list.getSelectionModel();
-        if(multipleSelectionModel.getSelectedItem()==null) multipleSelectionModel.select(0);
+        multipleSelectionModel = users_list.getSelectionModel();
+        if (multipleSelectionModel.getSelectedItem() == null) multipleSelectionModel.select(0);
     }
 }
 

@@ -56,7 +56,7 @@ public class Handler implements SocketThreadListener {
                 Platform.runLater(() -> {
                     nickName = arr[1];
                     chatController.setTitle(arr[1]);
-                    chatController.appendToLog(getHistory());
+                    chatController.setHistoryToLog(getHistory());
                 });
                 break;
             case AUTH_DENIED:
@@ -117,11 +117,9 @@ public class Handler implements SocketThreadListener {
             if (countOfLines == 0) return "";
             if (countOfLines >= 100) startOfReadingLines = countOfLines - 100;
             else startOfReadingLines = 0;
-            countOfLines--;
             for (int i = startOfReadingLines; i < countOfLines; i++) {
                 history += lines.get(i) + "\n";
             }
-            history+=lines.get(countOfLines);
         } catch (IOException e) {
             System.out.println("History was not found");
         }
