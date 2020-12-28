@@ -14,7 +14,7 @@ import static ru.fomin.chat.client.gui.controllers.CommonCommands.*;
 
 
 public class AuthenticationController {
-    static RegistrationController registrationController;
+   public static RegistrationController registrationController;
     private boolean isConnected = false;
     static Handler handler;
     static String ip = "127.0.0.1";
@@ -101,4 +101,5 @@ public class AuthenticationController {
     static void socketTreadStop() {
         handler.stopSocketThread();
     }
+
 }

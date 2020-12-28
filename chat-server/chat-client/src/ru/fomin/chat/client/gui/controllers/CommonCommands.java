@@ -20,7 +20,7 @@ public final class CommonCommands {
     }
 
     static void showAndHideStages(String pathOfFXML, Labeled labeled) {
-        labeled.getScene().getWindow().hide();
+      Platform.runLater(()->labeled.getScene().getWindow().hide());
         Stage stage = getStage(pathOfFXML);
         stage.setResizable(false);
         stage.setOnCloseRequest(event -> {
@@ -54,5 +54,8 @@ public final class CommonCommands {
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         return stage;
+    }
+    static void showInfoMessage(String message) {
+        JOptionPane.showMessageDialog(null, message);
     }
 }

@@ -5,10 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import ru.fomin.chat.client.gui.controllers.AuthenticationController;
-import ru.fomin.chat.client.gui.controllers.ChatController;
-import ru.fomin.chat.client.gui.controllers.CommonCommands;
-import ru.fomin.chat.client.gui.controllers.RegistrationController;
+import ru.fomin.chat.client.gui.controllers.*;
 import rufomin.network.SocketThread;
 import rufomin.network.SocketThreadListener;
 
@@ -19,9 +16,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,9 +30,11 @@ import static ru.fomin.chat.common.Library.*;
 
 public class Handler implements SocketThreadListener {
     private SocketThread socketThread;
-    private String nickName;
+    public static String nickName;
     private AuthenticationController authenticationController;
     private ChatController chatController;
+    private final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss: ");
+    public static ChangeNicknameController changeNicknameController;
 
     public Handler(int port, String ip, AuthenticationController authenticationController) {
         this.authenticationController = authenticationController;
@@ -54,43 +56,40 @@ public class Handler implements SocketThreadListener {
                 Platform.runLater(() -> {
                     nickName = arr[1];
                     chatController.setTitle(arr[1]);
-                    chatController.appendToLog( getHistory());
+                    chatController.appendToLog(getHistory());
                 });
                 break;
             case AUTH_DENIED:
-                // putLog("Authorization failed");
                 JOptionPane.showMessageDialog(null, "Login or password is wrong!", "Authorization failed", JOptionPane.ERROR_MESSAGE);
                 break;
             case MSG_FORMAT_ERROR:
-                //  log.append(msg + "\n");
+                String finalMsg = msg;
+                Platform.runLater(() -> chatController.appendToLog(finalMsg + "\n"));
                 socketThread.close();
                 break;
             case TYPE_BROADCAST:
-                //   putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) +
-                //     arr[2] + ": " + arr[3]);
+                Platform.runLater(() -> chatController.appendToLog(DATE_FORMAT.format(Long.parseLong(arr[1])) + arr[2] + ": " + arr[3]));
                 break;
             case USER_LIST:
                 msg = msg.substring(USER_LIST.length() + DELIMITER.length());
                 String[] usersArray = msg.split(DELIMITER);
                 Arrays.sort(usersArray);
-                Platform.runLater(()-> chatController.setUsersList(usersArray) );
+                Platform.runLater(() -> chatController.setUsersList(usersArray));
                 break;
             case TYPE_PRIVATE:
-                // putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) + "private from " +
-                //  arr[2] + ": " + arr[3]);
+                Platform.runLater(() -> chatController.appendToLog(DATE_FORMAT.format(Long.parseLong(arr[1])) + "private from " + arr[2] + ": " + arr[3]));
                 break;
             case TYPE_ERROR_SENDING_YOURSELF:
-                // log.append("You try to send message yourself!\n");
+                Platform.runLater(() -> chatController.appendToLog("You try to send message yourself!"));
                 break;
             case REGISTRATION_SUCCESSFULLY:
-                //  registrationFrame.registrationSuccessful();
-                // isRegistrationProcess = false;
+                  AuthenticationController.registrationController.registrationSuccessful();
                 break;
             case REGISTRATION_NOT_SUCCESSFULLY:
-                //  registrationFrame.registrationNotSuccessful();
+                AuthenticationController.registrationController.registrationNotSuccessful();
                 break;
             case NICKNAME_WAS_CHANGED:
-                //  changingNicknameFrame.changingSuccessful();
+               Platform.runLater(()->changeNicknameController.changingSuccessful());
                 break;
             case CHANGING_PASSWORD:
                 //  changingPasswordFrame.changingSuccessful();
@@ -118,20 +117,30 @@ public class Handler implements SocketThreadListener {
             if (countOfLines == 0) return "";
             if (countOfLines >= 100) startOfReadingLines = countOfLines - 100;
             else startOfReadingLines = 0;
+            countOfLines--;
             for (int i = startOfReadingLines; i < countOfLines; i++) {
                 history += lines.get(i) + "\n";
             }
+            history+=lines.get(countOfLines);
         } catch (IOException e) {
             System.out.println("History was not found");
         }
         return (history);
     }
-
-    protected String getFilePath() {
+    public static void writeMessageToHistory(String msg) {
+        if (nickName == null ||msg.startsWith("You try")|| (msg.length() >= 16 && msg.substring(10, 16).equals(SERVER))) return;
+        try (FileWriter out = new FileWriter(getFilePath(), true)) {
+            out.write(msg);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static String getFilePath() {
         return (String.format("history_%s.txt", nickName));
     }
 
-    protected String getFilePath(String nickName) {
+    public static String getFilePath(String nickName) {
         return (String.format("history_%s.txt", nickName));
     }
 
@@ -151,15 +160,14 @@ public class Handler implements SocketThreadListener {
 
             }
         });
-
-
         nickName = null;
 
     }
 
     @Override
     public void onSocketReady(SocketThread thread, Socket socket) {
-      Platform.runLater(()->chatController.appendToLog("Start\n"));
+        if(chatController!=null)
+            Platform.runLater(() -> chatController.appendToLog("Start"));
     }
 
     @Override
@@ -181,12 +189,8 @@ public class Handler implements SocketThreadListener {
         socketThread.sendMessage(getChangingNicknameMessage(newNickname));
     }
 
-    public void setNickName(String newNickName) {
+    public static void setNickName(String newNickName) {
         nickName = newNickName;
-    }
-
-    public void logIn(String login, String password) {
-        socketThread.sendMessage(getAuthRequest(login, password));
     }
 
     public void stopSocketThread() {

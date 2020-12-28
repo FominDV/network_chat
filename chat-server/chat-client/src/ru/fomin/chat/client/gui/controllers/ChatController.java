@@ -3,11 +3,17 @@ package ru.fomin.chat.client.gui.controllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
+import ru.fomin.chat.client.core.Handler;
 
+import javax.swing.*;
 import java.util.Arrays;
 
 import static ru.fomin.chat.client.gui.controllers.CommonCommands.*;
+import static ru.fomin.chat.common.Library.getTypeClientBcast;
+import static ru.fomin.chat.common.Library.getTypeClientPrivate;
+
 public class ChatController {
 private MultipleSelectionModel<String> multipleSelectionModel;
     @FXML
@@ -43,9 +49,28 @@ private MultipleSelectionModel<String> multipleSelectionModel;
     @FXML
     void initialize() {
         AuthenticationController.handler.setChatController(this);
-
         btn_info.setOnAction(event -> showDeveloperInfo());
         btn_cancel.setOnAction(event -> exit());
+        btn_send.setOnAction(event -> sendMessage());
+        field_message.setOnAction(event -> sendMessage());
+        btn_change_nickname.setOnAction(event ->showStage("/ru/fomin/chat/client/gui/fxml/change_nickname.fxml"));
+    }
+
+    private void sendMessage() {
+        String msg = field_message.getText();
+        field_message.setText("");
+        field_message.requestFocus();
+        if (msg.matches("\\s*")){ return;}
+        if (cb_private.isSelected()) {
+            if (!(multipleSelectionModel.getSelectedItem() == null)) {
+                AuthenticationController.handler.sendMessage(getTypeClientPrivate(multipleSelectionModel.getSelectedItem(), msg));
+            } else {
+                appendToLog("ERROR of sending private message");
+                cb_private.setSelected(false);
+            }
+        } else {
+            AuthenticationController.handler.sendMessage(getTypeClientBcast(msg));
+        }
     }
 
     public void hide() {
@@ -59,7 +84,9 @@ private MultipleSelectionModel<String> multipleSelectionModel;
     }
 
     public void appendToLog(String message){
+        message+="\n";
         log.appendText(message);
+        Handler.writeMessageToHistory(message);
     }
 
     public void setUsersList(String[] usersArray) {
