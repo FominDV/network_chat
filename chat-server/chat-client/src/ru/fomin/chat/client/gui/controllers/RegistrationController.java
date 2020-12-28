@@ -63,6 +63,10 @@ AuthenticationController.registrationController=this;
             showErrorMessage("Password should not contain spaces");
             return false;
         }
+        if(nickname.matches(".*?[<>\\\\\\/\\*\\?\\|\"\\:].*?")){
+            showErrorMessage("Nickname should not contain symbols:\n<, >, \\,/,*,|,?,\",:");
+            return false;
+        }
         if (login.length() > maxLoginLength) {
             showErrorMessage("Length of login should not be greater than " + maxLoginLength);
             return false;

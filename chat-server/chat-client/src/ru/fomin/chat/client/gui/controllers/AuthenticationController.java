@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import ru.fomin.chat.client.core.Handler;
 
 import java.net.URL;
@@ -94,7 +95,7 @@ public class AuthenticationController {
         try {
             registrationController.returnToAuthentication();
         } catch (NullPointerException e) {
-            showStage("/ru/fomin/chat/client/gui/fxml/authentication.fxml");
+            getStage("/ru/fomin/chat/client/gui/fxml/authentication.fxml").show();
         }
 
     }

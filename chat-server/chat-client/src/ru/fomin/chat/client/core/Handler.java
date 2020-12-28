@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static ru.fomin.chat.common.Library.*;
-
 public class Handler implements SocketThreadListener {
     private SocketThread socketThread;
     public static String nickName;
@@ -33,7 +31,7 @@ public class Handler implements SocketThreadListener {
     private ChatController chatController;
     private final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss: ");
     public static ChangeNicknameController changeNicknameController;
-
+    public static ChangePasswordController changePasswordController;
     public Handler(int port, String ip, AuthenticationController authenticationController) {
         this.authenticationController = authenticationController;
         try {
@@ -90,10 +88,10 @@ public class Handler implements SocketThreadListener {
                 Platform.runLater(() -> changeNicknameController.changingSuccessful());
                 break;
             case CHANGING_PASSWORD:
-                //  changingPasswordFrame.changingSuccessful();
+                Platform.runLater(() ->   changePasswordController.changingSuccessful());
                 break;
             case CHANGING_PASSWORD_ERROR:
-                //  changingPasswordFrame.changingFailed();
+                Platform.runLater(() ->   changePasswordController.changingFailed());
                 break;
             default:
                 throw new RuntimeException("Unknown message type: " + msg);
@@ -111,7 +109,6 @@ public class Handler implements SocketThreadListener {
                 lines.add(line);
             }
         } catch (IOException e) {
-            System.out.println("History was not found");
         }finally {
             int length = lines.size();
             int start = length <= 100 ? 0 : length - 100;
@@ -149,11 +146,9 @@ public class Handler implements SocketThreadListener {
         authenticationController.changeIsConnected();
         Platform.runLater(() -> {
             authenticationController.reload();
-            try {
-                chatController.hide();
-            } catch (NullPointerException e) {
-
-            }
+              if(chatController!=null)  chatController.hide();
+              if(changeNicknameController!=null) changeNicknameController.exit();
+              if(changePasswordController!=null) changePasswordController.exit();
         });
         nickName = null;
 

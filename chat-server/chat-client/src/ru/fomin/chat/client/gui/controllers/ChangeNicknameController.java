@@ -15,6 +15,7 @@ import java.io.File;
 import static ru.fomin.chat.client.gui.controllers.CommonCommands.*;
 public class ChangeNicknameController {
 private String newNickname;
+    private static final String MESSAGE_SUCCESSFULLY_CHANGING_NICKNAME = "Nickname was changed\nFor finishing this process you should reconnect!\nNew nickname: ";
     @FXML
     private Button btn_info;
 
@@ -48,6 +49,10 @@ private String newNickname;
             showErrorMessage("Nickname should not contain spaces");
             return false;
         }
+        if(newNickname.matches(".*?[<>\\\\\\/\\*\\?\\|\"\\:].*?")){
+            showErrorMessage("Nickname should not contain symbols:\n<, >, \\,/,*,|,?,\",:");
+            return false;
+        }
         if (newNickname.length() > RegistrationController.maxNicknameLength) {
             showErrorMessage("Length of nickname should not be greater than " + RegistrationController.maxNicknameLength);
             return false;
@@ -55,7 +60,7 @@ private String newNickname;
         return true;
     }
 
-    private void exit(){
+    public void exit(){
         ChatController.isChangingNicknameOpened=false;
         btn_change.getScene().getWindow().hide();
     }
@@ -63,7 +68,7 @@ private String newNickname;
     public void changingSuccessful() {
         rewriteHistoryBuNewNickname();
         Handler.setNickName(newNickname);
-        showInfoMessage("Changing nickname is successfully\nNew nickname: "+newNickname);
+        showInfoMessage(MESSAGE_SUCCESSFULLY_CHANGING_NICKNAME+newNickname);
         exit();
     }
 

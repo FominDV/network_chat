@@ -16,7 +16,7 @@ import static ru.fomin.chat.common.Library.getTypeClientBcast;
 import static ru.fomin.chat.common.Library.getTypeClientPrivate;
 
 public class ChatController {
-    static boolean isChangingNicknameOpened = false;
+    static boolean isChangingNicknameOpened = false, isChangingPasswordOpened=false;
     private MultipleSelectionModel<String> multipleSelectionModel;
     @FXML
     private Label title;
@@ -59,6 +59,12 @@ public class ChatController {
             if (!isChangingNicknameOpened) {
                 isChangingNicknameOpened = true;
                 showStage("/ru/fomin/chat/client/gui/fxml/change_nickname.fxml");
+            }
+        });
+        btn_change_password.setOnAction(event -> {
+            if(!isChangingPasswordOpened){
+                isChangingPasswordOpened=true;
+                showStage("/ru/fomin/chat/client/gui/fxml/change_password.fxml");
             }
         });
     }
