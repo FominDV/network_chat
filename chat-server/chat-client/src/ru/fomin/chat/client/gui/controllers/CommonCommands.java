@@ -58,6 +58,7 @@ public final class CommonCommands {
         Parent root = loader.getRoot();
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
+        stage.setResizable(false);
         return stage;
     }
     static void showInfoMessage(String message) {

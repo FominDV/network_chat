@@ -3,6 +3,7 @@ package rufomin.network;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class SocketThread extends Thread {
@@ -10,7 +11,7 @@ public class SocketThread extends Thread {
     private final Socket socket;
     private DataOutputStream out;
     DataInputStream in;
-
+    private static final byte KEY=77;
     public SocketThread(SocketThreadListener listener, String name, Socket socket) {
         super(name);
         this.socket = socket;
@@ -28,6 +29,7 @@ public class SocketThread extends Thread {
             listener.onSocketReady(this, socket);
             while (!isInterrupted()) {
                 String msg = in.readUTF();
+                msg=coding(msg);
                 listener.onReceiveString(this, socket, msg);
             }
         } catch (EOFException | SocketException e) {
@@ -44,8 +46,8 @@ public class SocketThread extends Thread {
     }
 
 
-
     public synchronized boolean sendMessage(String msg) {
+        msg=coding(msg);
         try {
             out.writeUTF(msg);
             out.flush();
@@ -66,5 +68,12 @@ public class SocketThread extends Thread {
             listener.onSocketException(this, e);
         }
         interrupt();
+    }
+    static private String coding(String message){
+        byte[] bytes=message.getBytes(StandardCharsets.UTF_16);
+        for(int i=0;i<bytes.length;i++) bytes[i]^=KEY;
+        byte[] bytes1=new byte[bytes.length-2];
+        for(int i=0;i<bytes1.length;i++) bytes1[i]=bytes[i+2];
+        return new String(bytes1, StandardCharsets.UTF_16);
     }
 }
