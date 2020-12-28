@@ -95,8 +95,7 @@ public class ChatController {
     }
 
     public void appendToLog(String message) {
-        message += "\n";
-        log.appendText(message);
+        log.appendText(message+"\n");
         Handler.writeMessageToHistory(message);
     }
 

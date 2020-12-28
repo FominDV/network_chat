@@ -16,9 +16,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -83,13 +81,13 @@ public class Handler implements SocketThreadListener {
                 Platform.runLater(() -> chatController.appendToLog("You try to send message yourself!"));
                 break;
             case REGISTRATION_SUCCESSFULLY:
-                  AuthenticationController.registrationController.registrationSuccessful();
+                AuthenticationController.registrationController.registrationSuccessful();
                 break;
             case REGISTRATION_NOT_SUCCESSFULLY:
                 AuthenticationController.registrationController.registrationNotSuccessful();
                 break;
             case NICKNAME_WAS_CHANGED:
-               Platform.runLater(()->changeNicknameController.changingSuccessful());
+                Platform.runLater(() -> changeNicknameController.changingSuccessful());
                 break;
             case CHANGING_PASSWORD:
                 //  changingPasswordFrame.changingSuccessful();
@@ -105,35 +103,34 @@ public class Handler implements SocketThreadListener {
 
     private String getHistory() {
         String history = "";
-        try (RandomAccessFile in = new RandomAccessFile(getFilePath(), "r")) {
-            List<String> lines = new ArrayList<>();
-            String line;
+        List<String> lines = new ArrayList<>(100);
+        try (DataInputStream in = new DataInputStream(new FileInputStream(getFilePath()))) {
+            String line = "";
             while (true) {
-                line = in.readLine();
-                if (line != null) lines.add(line);
-                else break;
-            }
-            int startOfReadingLines, countOfLines = lines.size();
-            if (countOfLines == 0) return "";
-            if (countOfLines >= 100) startOfReadingLines = countOfLines - 100;
-            else startOfReadingLines = 0;
-            for (int i = startOfReadingLines; i < countOfLines; i++) {
-                history += lines.get(i) + "\n";
+                line = in.readUTF();
+                lines.add(line);
             }
         } catch (IOException e) {
             System.out.println("History was not found");
+        }finally {
+            int length = lines.size();
+            int start = length <= 100 ? 0 : length - 100;
+            for (int i = start; i < length; i++) history += lines.get(i) + "\n";
+            return (history);
         }
-        return (history);
+
     }
+
     public static void writeMessageToHistory(String msg) {
-        if (nickName == null ||msg.startsWith("You try")|| (msg.length() >= 16 && msg.substring(10, 16).equals(SERVER))) return;
-        try (FileWriter out = new FileWriter(getFilePath(), true)) {
-            out.write(msg);
-            out.flush();
+        if (nickName == null || msg.startsWith("You try") || (msg.length() >= 16 && msg.substring(10, 16).equals(SERVER)))
+            return;
+        try (DataOutputStream out = new DataOutputStream(new FileOutputStream(getFilePath(), true))) {
+            out.writeUTF(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     public static String getFilePath() {
         return (String.format("history_%s.txt", nickName));
     }
@@ -164,7 +161,7 @@ public class Handler implements SocketThreadListener {
 
     @Override
     public void onSocketReady(SocketThread thread, Socket socket) {
-        if(chatController!=null)
+        if (chatController != null)
             Platform.runLater(() -> chatController.appendToLog("Start"));
     }
 
@@ -181,10 +178,6 @@ public class Handler implements SocketThreadListener {
 
     private void showConnectionError() {
         JOptionPane.showMessageDialog(null, "Connection was lost", "Connection ERROR", JOptionPane.ERROR_MESSAGE);
-    }
-
-    public void sendChangingNicknameMessage(String newNickname) {
-        socketThread.sendMessage(getChangingNicknameMessage(newNickname));
     }
 
     public static void setNickName(String newNickName) {
