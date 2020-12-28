@@ -69,7 +69,7 @@ public class SocketThread extends Thread {
         }
         interrupt();
     }
-    static private String coding(String message){
+     private String coding(String message){
         byte[] bytes=message.getBytes(StandardCharsets.UTF_16);
         for(int i=2;i<bytes.length;i++) bytes[i]^=KEY;
         return new String(bytes, StandardCharsets.UTF_16);
