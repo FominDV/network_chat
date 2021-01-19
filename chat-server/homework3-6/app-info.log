@@ -1,0 +1,33 @@
+[INFO ] 2021-01-20 00:05:09.096 [main] TestingMethods - start method getFormattedArray
+[DEBUG] 2021-01-20 00:05:09.098 [main] TestingMethods - input arr: [1, 4, 3, 4, 5]
+[INFO ] 2021-01-20 00:05:09.098 [main] TestingMethods - Number 4 was found
+[INFO ] 2021-01-20 00:05:09.102 [main] TestingMethods - start method getFormattedArray
+[DEBUG] 2021-01-20 00:05:09.102 [main] TestingMethods - input arr: [4, 1, 2, 3]
+[INFO ] 2021-01-20 00:05:09.102 [main] TestingMethods - Number 4 was found
+[INFO ] 2021-01-20 00:05:09.102 [main] TestingMethods - start method getFormattedArray
+[DEBUG] 2021-01-20 00:05:09.102 [main] TestingMethods - input arr: [33, 645, 4]
+[INFO ] 2021-01-20 00:05:09.102 [main] TestingMethods - Number 4 was found
+[INFO ] 2021-01-20 00:05:09.104 [main] TestingMethods - start method hasOneAndFour
+[DEBUG] 2021-01-20 00:05:09.104 [main] TestingMethods - input arr: [1, 1, 4, 4, 1]
+[INFO ] 2021-01-20 00:05:09.104 [main] TestingMethods - There are numbers 1 and 4
+[INFO ] 2021-01-20 00:05:09.105 [main] TestingMethods - start method hasOneAndFour
+[DEBUG] 2021-01-20 00:05:09.105 [main] TestingMethods - input arr: [4, 3, 2, 6, 1]
+[INFO ] 2021-01-20 00:05:09.106 [main] TestingMethods - There are numbers 1 and 4
+[INFO ] 2021-01-20 00:05:09.106 [main] TestingMethods - start method hasOneAndFour
+[DEBUG] 2021-01-20 00:05:09.106 [main] TestingMethods - input arr: [0, -590, 33, 1, 4, 0]
+[INFO ] 2021-01-20 00:05:09.106 [main] TestingMethods - There are numbers 1 and 4
+[INFO ] 2021-01-20 00:05:09.107 [main] TestingMethods - start method getFormattedArray
+[DEBUG] 2021-01-20 00:05:09.107 [main] TestingMethods - input arr: [1, 345, -87, 2, 0]
+[WARN ] 2021-01-20 00:05:09.107 [main] TestingMethods - There are not number 4
+[INFO ] 2021-01-20 00:05:09.108 [main] TestingMethods - start method getFormattedArray
+[DEBUG] 2021-01-20 00:05:09.108 [main] TestingMethods - input arr: []
+[WARN ] 2021-01-20 00:05:09.108 [main] TestingMethods - There are not number 4
+[INFO ] 2021-01-20 00:05:09.109 [main] TestingMethods - start method hasOneAndFour
+[DEBUG] 2021-01-20 00:05:09.109 [main] TestingMethods - input arr: [1, 1, 1, 1, 1]
+[WARN ] 2021-01-20 00:05:09.109 [main] TestingMethods - There are not 1 or 4
+[INFO ] 2021-01-20 00:05:09.110 [main] TestingMethods - start method hasOneAndFour
+[DEBUG] 2021-01-20 00:05:09.110 [main] TestingMethods - input arr: [1, 5, 3, 2]
+[WARN ] 2021-01-20 00:05:09.110 [main] TestingMethods - There are not 1 or 4
+[INFO ] 2021-01-20 00:05:09.111 [main] TestingMethods - start method hasOneAndFour
+[DEBUG] 2021-01-20 00:05:09.111 [main] TestingMethods - input arr: [4, 4, 4, 4, 4]
+[WARN ] 2021-01-20 00:05:09.111 [main] TestingMethods - There are not 1 or 4
