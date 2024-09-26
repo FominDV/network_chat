@@ -6,20 +6,34 @@ import rufomin.network.ServerSocketThreadListener;
 import rufomin.network.SocketThread;
 import rufomin.network.SocketThreadListener;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
+import java.util.logging.*;
 
 public class ChatServer implements ServerSocketThreadListener, SocketThreadListener {
+    private static final Logger LOGGER=Logger.getLogger(ChatServer.class.getName());
+    static {
+        try {
+            LogManager.getLogManager().readConfiguration();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
     private final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss: ");
     private final ChatServerListener listener;
     private final Vector<SocketThread> clients;
     private ServerSocketThread thread;
 
-    public ChatServer(ChatServerListener listener) {
+    public ChatServer(ChatServerListener listener) throws IOException {
         this.listener = listener;
         this.clients = new Vector<>();
     }
@@ -168,6 +182,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     public void onServerStart(ServerSocketThread thread) {
         putLog("Server thread started");
         SqlClient.connect();
+        LOGGER.info("Server was started");
     }
 
     @Override
@@ -177,6 +192,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
         for (int i = 0; i < clients.size(); i++) {
             clients.get(i).close();
         }
+        LOGGER.info("Server was stopped");
     }
 
     @Override
@@ -201,7 +217,8 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     @Override
     public void onServerException(ServerSocketThread thread, Throwable exception) {
-        exception.printStackTrace();
+        LOGGER.log(Level.SEVERE,"ServerException",exception);
+      //  exception.printStackTrace();
     }
 
     /**
@@ -235,6 +252,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     @Override
     public synchronized void onReceiveString(SocketThread thread, Socket socket, String msg) {
+        LOGGER.info("Message by client was gotten");
         ClientThread client = (ClientThread) thread;
         if (client.isAuthorized())
             handleAuthMessage(client, msg);
@@ -244,7 +262,8 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     @Override
     public synchronized void onSocketException(SocketThread thread, Exception exception) {
-        exception.printStackTrace();
+        LOGGER.log(Level.SEVERE,"ServerException",exception);
+       // exception.printStackTrace();
     }
 
 }
